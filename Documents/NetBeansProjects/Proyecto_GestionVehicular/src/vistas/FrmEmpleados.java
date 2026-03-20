@@ -1,8 +1,11 @@
 package vistas;
 
 import dao.EmpleadoDAO;
+import java.text.ParseException;
 import javax.swing.*;
 import javax.swing.table.DefaultTableModel;
+import javax.swing.text.DefaultFormatterFactory;
+import javax.swing.text.MaskFormatter;
 import modelo.Empleado;
 
 public class FrmEmpleados extends javax.swing.JInternalFrame {
@@ -13,6 +16,9 @@ public class FrmEmpleados extends javax.swing.JInternalFrame {
     public FrmEmpleados() {
         initComponents();
         cargarTabla();
+        formatoDui();
+        formatoTelefono();
+        
         ButtonGroup grupoLicencia = new ButtonGroup();
         grupoLicencia.add(rbSiLicencia);
         grupoLicencia.add(rbNoLicencia);
@@ -297,6 +303,26 @@ public class FrmEmpleados extends javax.swing.JInternalFrame {
             });
         }
     }
+    
+    private void formatoDui() {
+        try {
+            MaskFormatter formatter = new MaskFormatter("########-#");
+            formatter.setPlaceholderCharacter('_');
+            txtDui.setFormatterFactory(new DefaultFormatterFactory(formatter));
+        } catch (ParseException e) {
+            e.printStackTrace();
+        }
+    }
+    
+    private void formatoTelefono(){
+       try {
+            MaskFormatter formatter = new MaskFormatter("####-####");
+            formatter.setPlaceholderCharacter('_');
+            txtTelefono.setFormatterFactory(new DefaultFormatterFactory(formatter));
+        } catch (ParseException e) {
+            e.printStackTrace();
+        }
+   }
     
     private void validarCampos() throws Exception {
         if (txtNombres.getText().trim().isEmpty() ||

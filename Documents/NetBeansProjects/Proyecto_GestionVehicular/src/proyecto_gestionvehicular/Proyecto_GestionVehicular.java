@@ -6,13 +6,7 @@ package proyecto_gestionvehicular;
 
 import conexion.Conexion;
 import java.sql.Connection;
-import java.sql.DriverManager;
-import java.sql.SQLException;
 
-/**
- *
- * @author ivone
- */
 public class Proyecto_GestionVehicular {
 
     /**
@@ -22,9 +16,9 @@ public class Proyecto_GestionVehicular {
         Connection con = Conexion.getConexion();
 
         if (con != null) {
-            System.out.println("🔥 TODO FUNCIONA");
+            System.out.println("TODO FUNCIONA");
         } else {
-            System.out.println("💀 NO CONECTA");
+            System.out.println("NO CONECTA");
         }
     }
     

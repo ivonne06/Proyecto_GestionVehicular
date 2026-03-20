@@ -1,7 +1,5 @@
 package modelo;
 
-import java.util.Date;
-
 public class Empleado {
      private int idEmpleado;
     private String nombres;

@@ -11,9 +11,11 @@ public class EmpleadoDAO {
     PreparedStatement ps;
     ResultSet rs;
     
-    //INSERTAR (NO necesitas id_usuario, el trigger lo hace)
+    //INSERTAR
     public boolean insertar(Empleado emp) {
-        String sql = "INSERT INTO Empleados (nombres, apellidos, dui, telefono, cargo, departamento, licencia) VALUES (?, ?, ?, ?, ?, ?, ?)";
+        String sql = "INSERT INTO Empleados "
+                + "(nombres, apellidos, dui, telefono, cargo, departamento, "
+                + "licencia) VALUES (?, ?, ?, ?, ?, ?, ?)";
 
         try {
             con = Conexion.getConexion();
@@ -36,7 +38,7 @@ public class EmpleadoDAO {
         }
     }
     
-    // 🔹 LISTAR
+    // LISTAR
     public List<Empleado> listar() {
         List<Empleado> lista = new ArrayList<>();
 
@@ -62,7 +64,6 @@ public class EmpleadoDAO {
                 emp.setEstado(rs.getString("estado"));
                 emp.setLicencia(rs.getString("licencia"));
 
-                // 🔥 nuevo
                 emp.setUsername(rs.getString("username"));
 
                 lista.add(emp);
@@ -154,101 +155,9 @@ public class EmpleadoDAO {
             if (rs.next()) {
                 return true;
             }
-
         } catch (SQLException e) {
             System.out.println("Error DUI: " + e.getMessage());
         }
-
         return false;
     }
-    
-    /*//LISTAR
-    public List<Empleado> listar() {
-
-        List<Empleado> lista = new ArrayList<>();
-        String sql = "SELECT * FROM Empleados";
-
-        try (Connection con = Conexion.getConexion();
-             PreparedStatement ps = con.prepareStatement(sql);
-             ResultSet rs = ps.executeQuery()) {
-
-            while (rs.next()) {
-
-                Empleado e = new Empleado();
-
-                e.setId(rs.getInt("id_empleado"));
-                e.setNombres(rs.getString("nombres"));
-                e.setApellidos(rs.getString("apellidos"));
-                e.setDui(rs.getString("dui"));
-                e.setTelefono(rs.getString("telefono"));
-                e.setCargo(rs.getString("cargo"));
-                e.setDepartamento(rs.getString("departamento"));
-                e.setEstado(rs.getString("estado"));
-                e.setFechaRegistro(rs.getDate("fecha_registro"));
-                e.setLicencia(rs.getString("licencia"));
-                e.setIdUsuario(rs.getInt("id_usuario"));
-
-                lista.add(e);
-            }
-
-        } catch (SQLException e) {
-            System.out.println("Error listar: " + e.getMessage());
-        }
-
-        return lista;
-    }
-
-    //INSERTAR
-    public boolean insertar(Empleado e) {
-
-        String sql = "INSERT INTO Empleados(nombres, apellidos, dui, telefono, cargo, departamento, estado, licencia, id_usuario) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)";
-
-        try (Connection con = Conexion.getConexion();
-             PreparedStatement ps = con.prepareStatement(sql)) {
-
-            ps.setString(1, e.getNombres());
-            ps.setString(2, e.getApellidos());
-            ps.setString(3, e.getDui());
-            ps.setString(4, e.getTelefono());
-            ps.setString(5, e.getCargo());
-            ps.setString(6, e.getDepartamento());
-            ps.setString(7, e.getEstado());
-            ps.setString(8, e.getLicencia());
-            ps.setInt(9, e.getIdUsuario());
-
-            return ps.executeUpdate() > 0;
-
-        } catch (SQLException ex) {
-            System.out.println("Error insertar: " + ex.getMessage());
-            return false;
-        }
-    }
-
-    //ACTUALIZAR
-    public boolean actualizar(Empleado e) {
-
-        String sql = "UPDATE Empleados SET nombres=?, apellidos=?, dui=?, telefono=?, cargo=?, departamento=?, estado=?, licencia=? WHERE id_empleado=?";
-
-        try (Connection con = Conexion.getConexion();
-             PreparedStatement ps = con.prepareStatement(sql)) {
-
-            ps.setString(1, e.getNombres());
-            ps.setString(2, e.getApellidos());
-            ps.setString(3, e.getDui());
-            ps.setString(4, e.getTelefono());
-            ps.setString(5, e.getCargo());
-            ps.setString(6, e.getDepartamento());
-            ps.setString(7, e.getEstado());
-            ps.setString(8, e.getLicencia());
-            ps.setInt(9, e.getId());
-
-            return ps.executeUpdate() > 0;
-
-        } catch (SQLException ex) {
-            System.out.println("Error actualizar: " + ex.getMessage());
-            return false;
-        }
-    }
-
-    */
 }
