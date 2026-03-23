@@ -1,0 +1,19 @@
+# Compilados
+*.class
+
+# Logs
+*.log
+
+# NetBeans
+nbproject/private/
+build/
+dist/
+
+# Archivos de empaquetado
+*.jar
+*.war
+*.ear
+
+# Sistema
+.DS_Store
+Thumbs.db
