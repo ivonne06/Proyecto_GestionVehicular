@@ -4,6 +4,8 @@
  */
 package vistas;
 
+import modelo.Usuario;
+
 /**
  *
  * @author ivone
@@ -11,6 +13,8 @@ package vistas;
 public class FrmPrincipal extends javax.swing.JFrame {
     
     private static final java.util.logging.Logger logger = java.util.logging.Logger.getLogger(FrmPrincipal.class.getName());
+    
+    private modelo.Usuario userSesion;
 
     /**
      * Creates new form FrmPrincipal
@@ -20,6 +24,19 @@ public class FrmPrincipal extends javax.swing.JFrame {
         this.setExtendedState(MAXIMIZED_BOTH);
         this.setLocationRelativeTo(null);
     }
+    
+    public FrmPrincipal(modelo.Usuario usr) {
+        initComponents(); // SIEMPRE primero
+
+        this.userSesion = usr;
+
+        this.setLocationRelativeTo(null);
+        this.setExtendedState(MAXIMIZED_BOTH);
+
+        // Mostrar usuario en el título
+        this.setTitle("Gestión Vehicular - Usuario: " + usr.getUsername());
+    }
+    
 
     /**
      * This method is called from within the constructor to initialize the form.
@@ -124,6 +141,7 @@ public class FrmPrincipal extends javax.swing.JFrame {
         frm.setVisible(true);
     }//GEN-LAST:event_menuEmpleadosActionPerformed
 
+    
     /**
      * @param args the command line arguments
      */
@@ -147,6 +165,7 @@ public class FrmPrincipal extends javax.swing.JFrame {
 
         /* Create and display the form */
         java.awt.EventQueue.invokeLater(() -> new FrmPrincipal().setVisible(true));
+        
     }
 
     // Variables declaration - do not modify//GEN-BEGIN:variables

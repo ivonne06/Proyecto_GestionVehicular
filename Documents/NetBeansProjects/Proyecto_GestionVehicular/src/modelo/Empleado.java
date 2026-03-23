@@ -1,7 +1,7 @@
 package modelo;
 
 public class Empleado {
-     private int idEmpleado;
+    private int idEmpleado;
     private String nombres;
     private String apellidos;
     private String dui;
@@ -10,7 +10,9 @@ public class Empleado {
     private String departamento;
     private String estado;
     private String licencia;
-    private int idUsuario; // se llena automáticamente por el trigger
+    
+    // se llena automáticamente por el trigger
+    private int idUsuario; 
     private String username;
 
     //Constructor vacío

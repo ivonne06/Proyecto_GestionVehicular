@@ -7,8 +7,8 @@ import java.sql.SQLException;
 public class Conexion {
     private static final String URL = "jdbc:sqlserver://localhost:1433;databaseName=BD_GestionVehicular;encrypt=false";
     private static final String USER = "sa";       // usuario SQL Server
-    private static final String PASSWORD = "1234"; // tu contraseña
-    
+    private static final String PASSWORD = "1234"; // la contraseña
+            
     public static Connection getConexion() {
         Connection con = null;
 

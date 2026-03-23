@@ -291,12 +291,12 @@ public class FrmVehiculos extends javax.swing.JInternalFrame {
             throw new Exception("Todos los campos deben completarse.");
         }
 
-        // VALIDAR MARCA (solo letras)
+        // Validar marca (solo letras)
         if (!marca.matches("[a-zA-ZáéíóúÁÉÍÓÚñÑ ]+")) {
             throw new Exception("La marca solo debe contener letras.");
         }
 
-        // VALIDAR MODELO (puede tener letras y números)
+        // Validar modelo (puede tener letras y números)
         if (!modelo.matches("[a-zA-Z0-9 ]+")) {
             throw new Exception("El modelo solo debe contener letras y números.");
         }
