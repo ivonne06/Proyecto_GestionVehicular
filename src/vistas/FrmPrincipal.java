@@ -1,42 +1,63 @@
-/*
- * Click nbfs://nbhost/SystemFileSystem/Templates/Licenses/license-default.txt to change this license
- * Click nbfs://nbhost/SystemFileSystem/Templates/GUIForms/JFrame.java to edit this template
- */
 package vistas;
 
 import modelo.Usuario;
+import javax.swing.JInternalFrame;
+import javax.swing.JOptionPane;
 
-/**
- *
- * @author ivone
- */
 public class FrmPrincipal extends javax.swing.JFrame {
     
     private static final java.util.logging.Logger logger = java.util.logging.Logger.getLogger(FrmPrincipal.class.getName());
     
-    private modelo.Usuario userSesion;
+     private Usuario userSesion;
 
-    /**
-     * Creates new form FrmPrincipal
-     */
     public FrmPrincipal() {
         initComponents();
-        this.setExtendedState(MAXIMIZED_BOTH);
-        this.setLocationRelativeTo(null);
+        configurarVentana();
     }
-    
-    public FrmPrincipal(modelo.Usuario usr) {
-        initComponents(); // SIEMPRE primero
 
+    public FrmPrincipal(Usuario usr) {
+        initComponents();
         this.userSesion = usr;
+        configurarVentana();
+        mostrarMensajeUsuario();
+        mostrarUsuarioMenu();
+    }
 
-        this.setLocationRelativeTo(null);
+    private void configurarVentana() {
         this.setExtendedState(MAXIMIZED_BOTH);
+        this.setLocationRelativeTo(null);
+    }
 
-        // Mostrar usuario en el título
-        this.setTitle("Gestión Vehicular - Usuario: " + usr.getUsername());
+    private void mostrarMensajeUsuario() {
+        if (userSesion != null) {
+            this.setTitle("Gestión Vehicular | Usuario: " + userSesion.getUsername().toUpperCase());
+        }
     }
     
+    private void mostrarUsuarioMenu() {
+        if (userSesion != null) {
+            menuUsuario.setText(userSesion.getUsername());
+        } else {
+            menuUsuario.setText("Usuario");
+        }
+    }
+
+    private void abrirFormulario(JInternalFrame frm) {
+        for (JInternalFrame frame : escritorio.getAllFrames()) {
+            if (frame.getClass().equals(frm.getClass())) {
+                frame.toFront();
+                frame.requestFocus();
+                return;
+            }
+        }
+
+        escritorio.add(frm);
+        frm.setVisible(true);
+        frm.setLocation(
+            (escritorio.getWidth() - frm.getWidth()) / 2,
+            (escritorio.getHeight() - frm.getHeight()) / 2
+        );
+    }
 
     /**
      * This method is called from within the constructor to initialize the form.
@@ -49,13 +70,14 @@ public class FrmPrincipal extends javax.swing.JFrame {
 
         escritorio = new javax.swing.JDesktopPane();
         jMenuBar1 = new javax.swing.JMenuBar();
-        jMenu2 = new javax.swing.JMenu();
-        jMenu1 = new javax.swing.JMenu();
-        menuVehiculos = new javax.swing.JMenuItem();
-        menuEmpleados = new javax.swing.JMenuItem();
-        jMenuItem3 = new javax.swing.JMenuItem();
-        jMenuItem4 = new javax.swing.JMenuItem();
-        jMenuItem5 = new javax.swing.JMenuItem();
+        menuUsuario = new javax.swing.JMenu();
+        mItemSesion = new javax.swing.JMenuItem();
+        menuModulo = new javax.swing.JMenu();
+        mItemVehiculos = new javax.swing.JMenuItem();
+        mItemEmpleados = new javax.swing.JMenuItem();
+        mItemSolicitudes = new javax.swing.JMenuItem();
+        mItemAsignaciones = new javax.swing.JMenuItem();
+        mItemReportes = new javax.swing.JMenuItem();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
 
@@ -70,42 +92,56 @@ public class FrmPrincipal extends javax.swing.JFrame {
             .addGap(0, 511, Short.MAX_VALUE)
         );
 
-        jMenu2.setText("Archivo");
-        jMenuBar1.add(jMenu2);
+        menuUsuario.setText("Usuario");
 
-        jMenu1.setText("Modulos");
-        jMenu1.addActionListener(new java.awt.event.ActionListener() {
+        mItemSesion.setText("Cerrar Sesión");
+        mItemSesion.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
-                jMenu1ActionPerformed(evt);
+                mItemSesionActionPerformed(evt);
+            }
+        });
+        menuUsuario.add(mItemSesion);
+
+        jMenuBar1.add(menuUsuario);
+
+        menuModulo.setText("Modulos");
+        menuModulo.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                menuModuloActionPerformed(evt);
             }
         });
 
-        menuVehiculos.setText("Vehiculos");
-        menuVehiculos.addActionListener(new java.awt.event.ActionListener() {
+        mItemVehiculos.setText("Vehiculos");
+        mItemVehiculos.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
-                menuVehiculosActionPerformed(evt);
+                mItemVehiculosActionPerformed(evt);
             }
         });
-        jMenu1.add(menuVehiculos);
+        menuModulo.add(mItemVehiculos);
 
-        menuEmpleados.setText("Empleados");
-        menuEmpleados.addActionListener(new java.awt.event.ActionListener() {
+        mItemEmpleados.setText("Empleados");
+        mItemEmpleados.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
-                menuEmpleadosActionPerformed(evt);
+                mItemEmpleadosActionPerformed(evt);
             }
         });
-        jMenu1.add(menuEmpleados);
+        menuModulo.add(mItemEmpleados);
 
-        jMenuItem3.setText("Solicitudes");
-        jMenu1.add(jMenuItem3);
+        mItemSolicitudes.setText("Solicitudes");
+        menuModulo.add(mItemSolicitudes);
 
-        jMenuItem4.setText("Asignaciones");
-        jMenu1.add(jMenuItem4);
+        mItemAsignaciones.setText("Asignaciones");
+        mItemAsignaciones.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                mItemAsignacionesActionPerformed(evt);
+            }
+        });
+        menuModulo.add(mItemAsignaciones);
 
-        jMenuItem5.setText("Reportes");
-        jMenu1.add(jMenuItem5);
+        mItemReportes.setText("Reportes");
+        menuModulo.add(mItemReportes);
 
-        jMenuBar1.add(jMenu1);
+        jMenuBar1.add(menuModulo);
 
         setJMenuBar(jMenuBar1);
 
@@ -123,60 +159,62 @@ public class FrmPrincipal extends javax.swing.JFrame {
         pack();
     }// </editor-fold>//GEN-END:initComponents
 
-    private void jMenu1ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jMenu1ActionPerformed
+    private void menuModuloActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_menuModuloActionPerformed
         // TODO add your handling code here:
-    }//GEN-LAST:event_jMenu1ActionPerformed
+    }//GEN-LAST:event_menuModuloActionPerformed
 
-    private void menuVehiculosActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_menuVehiculosActionPerformed
-        FrmVehiculos frm = new FrmVehiculos();
+    private void mItemVehiculosActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_mItemVehiculosActionPerformed
+        abrirFormulario(new FrmVehiculos());
+    }//GEN-LAST:event_mItemVehiculosActionPerformed
 
-        escritorio.add(frm);
-        frm.setVisible(true);
-    }//GEN-LAST:event_menuVehiculosActionPerformed
+    private void mItemEmpleadosActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_mItemEmpleadosActionPerformed
+       abrirFormulario(new FrmEmpleados());
+    }//GEN-LAST:event_mItemEmpleadosActionPerformed
 
-    private void menuEmpleadosActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_menuEmpleadosActionPerformed
-        FrmEmpleados frm = new FrmEmpleados();
+    private void mItemSesionActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_mItemSesionActionPerformed
+        
+        System.out.println("Click en cerrar sesión");
+        
+        String nombre = userSesion != null ? userSesion.getUsername() : "Usuario";
 
-        escritorio.add(frm);
-        frm.setVisible(true);
-    }//GEN-LAST:event_menuEmpleadosActionPerformed
+        int opcion = JOptionPane.showConfirmDialog(
+            this,
+            "¿Seguro que desea cerrar sesión, " + nombre + "?",
+            "Cerrar sesión",
+            JOptionPane.YES_NO_OPTION,      // ✔ optionType
+            JOptionPane.QUESTION_MESSAGE   // ✔ messageType
+        );
+
+        if (opcion == JOptionPane.YES_OPTION) {
+            this.dispose();
+            new FrmLogin().setVisible(true);
+        }
+    }//GEN-LAST:event_mItemSesionActionPerformed
+
+    private void mItemAsignacionesActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_mItemAsignacionesActionPerformed
+        // TODO add your handling code here:
+    }//GEN-LAST:event_mItemAsignacionesActionPerformed
 
     
     /**
      * @param args the command line arguments
      */
     public static void main(String args[]) {
-        /* Set the Nimbus look and feel */
-        //<editor-fold defaultstate="collapsed" desc=" Look and feel setting code (optional) ">
-        /* If Nimbus (introduced in Java SE 6) is not available, stay with the default look and feel.
-         * For details see http://download.oracle.com/javase/tutorial/uiswing/lookandfeel/plaf.html 
-         */
-        try {
-            for (javax.swing.UIManager.LookAndFeelInfo info : javax.swing.UIManager.getInstalledLookAndFeels()) {
-                if ("Nimbus".equals(info.getName())) {
-                    javax.swing.UIManager.setLookAndFeel(info.getClassName());
-                    break;
-                }
-            }
-        } catch (ReflectiveOperationException | javax.swing.UnsupportedLookAndFeelException ex) {
-            logger.log(java.util.logging.Level.SEVERE, null, ex);
-        }
-        //</editor-fold>
-
-        /* Create and display the form */
-        java.awt.EventQueue.invokeLater(() -> new FrmPrincipal().setVisible(true));
-        
+        java.awt.EventQueue.invokeLater(() -> {
+            new FrmPrincipal().setVisible(true);
+        });
     }
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JDesktopPane escritorio;
-    private javax.swing.JMenu jMenu1;
-    private javax.swing.JMenu jMenu2;
     private javax.swing.JMenuBar jMenuBar1;
-    private javax.swing.JMenuItem jMenuItem3;
-    private javax.swing.JMenuItem jMenuItem4;
-    private javax.swing.JMenuItem jMenuItem5;
-    private javax.swing.JMenuItem menuEmpleados;
-    private javax.swing.JMenuItem menuVehiculos;
+    private javax.swing.JMenuItem mItemAsignaciones;
+    private javax.swing.JMenuItem mItemEmpleados;
+    private javax.swing.JMenuItem mItemReportes;
+    private javax.swing.JMenuItem mItemSesion;
+    private javax.swing.JMenuItem mItemSolicitudes;
+    private javax.swing.JMenuItem mItemVehiculos;
+    private javax.swing.JMenu menuModulo;
+    private javax.swing.JMenu menuUsuario;
     // End of variables declaration//GEN-END:variables
 }
