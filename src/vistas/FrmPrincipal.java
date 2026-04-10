@@ -73,8 +73,9 @@ public class FrmPrincipal extends javax.swing.JFrame {
         menuUsuario = new javax.swing.JMenu();
         mItemSesion = new javax.swing.JMenuItem();
         menuModulo = new javax.swing.JMenu();
-        mItemVehiculos = new javax.swing.JMenuItem();
+        mItemUsuarios = new javax.swing.JMenuItem();
         mItemEmpleados = new javax.swing.JMenuItem();
+        mItemVehiculos = new javax.swing.JMenuItem();
         mItemSolicitudes = new javax.swing.JMenuItem();
         mItemAsignaciones = new javax.swing.JMenuItem();
         mItemReportes = new javax.swing.JMenuItem();
@@ -111,13 +112,13 @@ public class FrmPrincipal extends javax.swing.JFrame {
             }
         });
 
-        mItemVehiculos.setText("Vehiculos");
-        mItemVehiculos.addActionListener(new java.awt.event.ActionListener() {
+        mItemUsuarios.setText("Usuarios");
+        mItemUsuarios.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
-                mItemVehiculosActionPerformed(evt);
+                mItemUsuariosActionPerformed(evt);
             }
         });
-        menuModulo.add(mItemVehiculos);
+        menuModulo.add(mItemUsuarios);
 
         mItemEmpleados.setText("Empleados");
         mItemEmpleados.addActionListener(new java.awt.event.ActionListener() {
@@ -126,6 +127,14 @@ public class FrmPrincipal extends javax.swing.JFrame {
             }
         });
         menuModulo.add(mItemEmpleados);
+
+        mItemVehiculos.setText("Vehiculos");
+        mItemVehiculos.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                mItemVehiculosActionPerformed(evt);
+            }
+        });
+        menuModulo.add(mItemVehiculos);
 
         mItemSolicitudes.setText("Solicitudes");
         menuModulo.add(mItemSolicitudes);
@@ -172,17 +181,14 @@ public class FrmPrincipal extends javax.swing.JFrame {
     }//GEN-LAST:event_mItemEmpleadosActionPerformed
 
     private void mItemSesionActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_mItemSesionActionPerformed
-        
-        System.out.println("Click en cerrar sesión");
-        
         String nombre = userSesion != null ? userSesion.getUsername() : "Usuario";
 
         int opcion = JOptionPane.showConfirmDialog(
             this,
             "¿Seguro que desea cerrar sesión, " + nombre + "?",
             "Cerrar sesión",
-            JOptionPane.YES_NO_OPTION,      // ✔ optionType
-            JOptionPane.QUESTION_MESSAGE   // ✔ messageType
+            JOptionPane.YES_NO_OPTION,
+            JOptionPane.QUESTION_MESSAGE
         );
 
         if (opcion == JOptionPane.YES_OPTION) {
@@ -194,6 +200,10 @@ public class FrmPrincipal extends javax.swing.JFrame {
     private void mItemAsignacionesActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_mItemAsignacionesActionPerformed
         // TODO add your handling code here:
     }//GEN-LAST:event_mItemAsignacionesActionPerformed
+
+    private void mItemUsuariosActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_mItemUsuariosActionPerformed
+       abrirFormulario(new FrmUsuarios());
+    }//GEN-LAST:event_mItemUsuariosActionPerformed
 
     
     /**
@@ -213,6 +223,7 @@ public class FrmPrincipal extends javax.swing.JFrame {
     private javax.swing.JMenuItem mItemReportes;
     private javax.swing.JMenuItem mItemSesion;
     private javax.swing.JMenuItem mItemSolicitudes;
+    private javax.swing.JMenuItem mItemUsuarios;
     private javax.swing.JMenuItem mItemVehiculos;
     private javax.swing.JMenu menuModulo;
     private javax.swing.JMenu menuUsuario;

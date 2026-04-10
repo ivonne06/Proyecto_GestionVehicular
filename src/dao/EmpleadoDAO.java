@@ -105,41 +105,6 @@ public class EmpleadoDAO {
         }
     }
     
-    //ELIMINAR o DESACTIVAR
-    public boolean desactivar(int id) {
-
-        String sql = "UPDATE Empleados SET estado='INACTIVO' WHERE id_empleado=?";
-
-        try (Connection con = Conexion.getConexion();
-             PreparedStatement ps = con.prepareStatement(sql)) {
-
-            ps.setInt(1, id);
-
-            return ps.executeUpdate() > 0;
-
-        } catch (SQLException ex) {
-            System.out.println("Error desactivar: " + ex.getMessage());
-            return false;
-        }
-    }
-    
-    public boolean activar(int id) {
-
-        String sql = "UPDATE Empleados SET estado='ACTIVO' WHERE id_empleado=?";
-
-        try (Connection con = Conexion.getConexion();
-             PreparedStatement ps = con.prepareStatement(sql)) {
-
-            ps.setInt(1, id);
-
-            return ps.executeUpdate() > 0;
-
-        } catch (SQLException ex) {
-            System.out.println("Error activar: " + ex.getMessage());
-            return false;
-        }
-    }
-    
     public boolean duiExiste(int id, String dui) {
 
         String sql = "SELECT 1 FROM Empleados WHERE dui=? AND id_empleado<>?";

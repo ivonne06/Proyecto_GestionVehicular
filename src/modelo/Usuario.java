@@ -16,6 +16,9 @@ public class Usuario {
     private boolean estado;
     private boolean debeCambiarPassword;
 
+    
+    private String nombreCompleto;
+
     public Usuario() {}
 
     // Getters y Setters
@@ -29,5 +32,13 @@ public class Usuario {
     public void setEstado(boolean estado) { this.estado = estado; }
     public boolean isDebeCambiarPassword() { return debeCambiarPassword; }
     public void setDebeCambiarPassword(boolean debeCambiarPassword) { this.debeCambiarPassword = debeCambiarPassword; }
+    public String getNombreCompleto() {
+        return nombreCompleto;
+    }
+
+    public void setNombreCompleto(String nombreCompleto) {
+        this.nombreCompleto = nombreCompleto;
+    }
+    
     
 }

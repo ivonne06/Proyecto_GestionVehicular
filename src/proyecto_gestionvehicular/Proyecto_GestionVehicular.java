@@ -4,9 +4,6 @@
  */
 package proyecto_gestionvehicular;
 
-import conexion.Conexion;
-import java.sql.Connection;
-import util.Seeder;
 import vistas.FrmLogin;
 
 public class Proyecto_GestionVehicular {
@@ -15,21 +12,18 @@ public class Proyecto_GestionVehicular {
      * @param args the command line arguments
      */
     public static void main(String[] args) {
-        Connection con = Conexion.getConexion();
-        
-        if (con != null) {
-            System.out.println("TODO FUNCIONA");
-
-            // seeder para usuario admin
-            Seeder.seedAdmin();
-
-            java.awt.EventQueue.invokeLater(() -> {
-                new FrmLogin().setVisible(true);
-            });
-
-        } else {
-            System.out.println("NO CONECTA");
+        try {
+            for (javax.swing.UIManager.LookAndFeelInfo info : javax.swing.UIManager.getInstalledLookAndFeels()) {
+                if ("Nimbus".equals(info.getName())) {
+                    javax.swing.UIManager.setLookAndFeel(info.getClassName());
+                    break;
+                }
+            }
+        } catch (ReflectiveOperationException | javax.swing.UnsupportedLookAndFeelException ex) {
+            //logger.log(java.util.logging.Level.SEVERE, null, ex);
         }
+       
+        java.awt.EventQueue.invokeLater(() -> new FrmLogin().setVisible(true));
     }
     
 }

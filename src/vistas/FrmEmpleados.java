@@ -63,8 +63,6 @@ public class FrmEmpleados extends javax.swing.JInternalFrame {
         txtIdEmpleado = new javax.swing.JTextField();
         jLabel11 = new javax.swing.JLabel();
         btnActualizar = new javax.swing.JButton();
-        btnDesactivar = new javax.swing.JButton();
-        btnActivar = new javax.swing.JButton();
 
         setClosable(true);
         setIconifiable(true);
@@ -152,20 +150,6 @@ public class FrmEmpleados extends javax.swing.JInternalFrame {
             }
         });
 
-        btnDesactivar.setText("Desactivar");
-        btnDesactivar.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                btnDesactivarActionPerformed(evt);
-            }
-        });
-
-        btnActivar.setText("Activar");
-        btnActivar.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                btnActivarActionPerformed(evt);
-            }
-        });
-
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(getContentPane());
         getContentPane().setLayout(layout);
         layout.setHorizontalGroup(
@@ -222,11 +206,7 @@ public class FrmEmpleados extends javax.swing.JInternalFrame {
                         .addComponent(btnGuardar)
                         .addGap(30, 30, 30)
                         .addComponent(btnActualizar)
-                        .addGap(18, 18, 18)
-                        .addComponent(btnDesactivar)
-                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
-                        .addComponent(btnActivar)
-                        .addGap(252, 252, 252))))
+                        .addGap(439, 439, 439))))
         );
         layout.setVerticalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
@@ -257,9 +237,7 @@ public class FrmEmpleados extends javax.swing.JInternalFrame {
                         .addGap(72, 72, 72)
                         .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                             .addComponent(btnGuardar)
-                            .addComponent(btnActualizar)
-                            .addComponent(btnDesactivar)
-                            .addComponent(btnActivar)))
+                            .addComponent(btnActualizar)))
                     .addGroup(layout.createSequentialGroup()
                         .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                             .addComponent(jLabel1)
@@ -355,8 +333,6 @@ public class FrmEmpleados extends javax.swing.JInternalFrame {
         rbNoLicencia.setSelected(true);
         txtLicencia.setEnabled(false);
         
-        btnActivar.setEnabled(false);
-        btnDesactivar.setEnabled(false);
         btnActualizar.setEnabled(false);
     }
     
@@ -415,17 +391,6 @@ public class FrmEmpleados extends javax.swing.JInternalFrame {
         txtTelefono.setText(tblEmpleados.getValueAt(fila, 4).toString());
         txtCargo.setText(tblEmpleados.getValueAt(fila, 5).toString());
         txtDepartamento.setText(tblEmpleados.getValueAt(fila, 6).toString());
-
-        String estado = tblEmpleados.getValueAt(fila, 7).toString();
-
-        // Control de botones
-        if ("ACTIVO".equals(estado)) {
-            btnActivar.setEnabled(false);
-            btnDesactivar.setEnabled(true);
-        } else {
-            btnActivar.setEnabled(true);
-            btnDesactivar.setEnabled(false);
-        }
 
         String lic = tblEmpleados.getValueAt(fila, 8).toString();
 
@@ -497,60 +462,12 @@ public class FrmEmpleados extends javax.swing.JInternalFrame {
         txtLicencia.setText("SIN LICENCIA");
     }//GEN-LAST:event_rbNoLicenciaActionPerformed
 
-    private void btnDesactivarActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnDesactivarActionPerformed
-       try {
-            int id = Integer.parseInt(txtIdEmpleado.getText());
-
-            int confirm = JOptionPane.showConfirmDialog(this,
-                    "¿Desea desactivar este empleado?",
-                    "Confirmar",
-                    JOptionPane.YES_NO_OPTION);
-
-            if (confirm == JOptionPane.YES_OPTION) {
-
-                if (dao.desactivar(id)) {
-                    JOptionPane.showMessageDialog(this, "Empleado desactivado");
-                    cargarTabla();
-                    limpiar();
-                }
-            }
-
-        } catch (Exception e) {
-            JOptionPane.showMessageDialog(this, "Seleccione un empleado");
-        }
-    }//GEN-LAST:event_btnDesactivarActionPerformed
-
-    private void btnActivarActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnActivarActionPerformed
-       try {
-            int id = Integer.parseInt(txtIdEmpleado.getText());
-
-            int confirm = JOptionPane.showConfirmDialog(this,
-                    "¿Desea activar este empleado?",
-                    "Confirmar",
-                    JOptionPane.YES_NO_OPTION);
-
-            if (confirm == JOptionPane.YES_OPTION) {
-
-                if (dao.activar(id)) {
-                    JOptionPane.showMessageDialog(this, "Empleado activado");
-                    cargarTabla();
-                    limpiar();
-                }
-            }
-
-        } catch (Exception e) {
-            JOptionPane.showMessageDialog(this, "Seleccione un empleado");
-        } 
-    }//GEN-LAST:event_btnActivarActionPerformed
-
     
     
 
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
-    private javax.swing.JButton btnActivar;
     private javax.swing.JButton btnActualizar;
-    private javax.swing.JButton btnDesactivar;
     private javax.swing.JButton btnGuardar;
     private javax.swing.JLabel jLabel1;
     private javax.swing.JLabel jLabel10;
