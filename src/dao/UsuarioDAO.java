@@ -129,6 +129,26 @@ public class UsuarioDAO {
         return false;
     }
     
+    public boolean cambiarPassword(int idUsuario, String nuevaPass) {
+    boolean resp = false;
+
+    try {
+        Connection con = Conexion.getConexion();
+        String sql = "UPDATE Usuarios SET password = ?, debe_cambiar_password = 0 WHERE id_usuario = ?";
+
+        PreparedStatement ps = con.prepareStatement(sql);
+        ps.setString(1, nuevaPass);
+        ps.setInt(2, idUsuario);
+
+        resp = ps.executeUpdate() > 0;
+
+    } catch (Exception e) {
+        e.printStackTrace();
+    }
+
+    return resp;
+}
+    
 }
 
 

@@ -11,7 +11,7 @@ public class VehiculoDAO {
 
     // INSERTAR
     public boolean insertar(Vehiculo v) {
-        String sql = "INSERT INTO Vehiculos (marca, modelo, placa, tipo, estado) VALUES (?, ?, ?, ?, ?)";
+        String sql = "INSERT INTO Vehiculos (marca, modelo, placa, pasajeros, tipo, estado) VALUES (?, ?, ?, ?, ?, ?)";
 
         try (Connection con = Conexion.getConexion();
              PreparedStatement ps = con.prepareStatement(sql)) {
@@ -19,8 +19,9 @@ public class VehiculoDAO {
             ps.setString(1, v.getMarca());
             ps.setString(2, v.getModelo());
             ps.setString(3, v.getPlaca());
-            ps.setString(4, v.getTipo());
-            ps.setString(5, v.getEstado());
+            ps.setInt(4, v.getPasajeros());
+            ps.setString(5, v.getTipo());
+            ps.setString(6, v.getEstado());
 
             ps.executeUpdate();
             return true;
@@ -46,6 +47,7 @@ public class VehiculoDAO {
                 v.setMarca(rs.getString("marca"));
                 v.setModelo(rs.getString("modelo"));
                 v.setPlaca(rs.getString("placa"));
+                v.setPasajeros(rs.getInt("pasajeros"));
                 v.setTipo(rs.getString("tipo"));
                 v.setEstado(rs.getString("estado"));
                 lista.add(v);
@@ -77,7 +79,7 @@ public class VehiculoDAO {
 
     // ACTUALIZAR
     public boolean actualizar(Vehiculo v) {
-        String sql = "UPDATE Vehiculos SET marca=?, modelo=?, placa=?, tipo=?, estado=? WHERE id_vehiculo=?";
+        String sql = "UPDATE Vehiculos SET marca=?, modelo=?, placa=?, pasajeros=?, tipo=?, estado=? WHERE id_vehiculo=?";
 
         try (Connection con = Conexion.getConexion();
              PreparedStatement ps = con.prepareStatement(sql)) {
@@ -85,9 +87,10 @@ public class VehiculoDAO {
             ps.setString(1, v.getMarca());
             ps.setString(2, v.getModelo());
             ps.setString(3, v.getPlaca());
-            ps.setString(4, v.getTipo());
-            ps.setString(5, v.getEstado());
-            ps.setInt(6, v.getId());
+            ps.setInt(4, v.getPasajeros());
+            ps.setString(5, v.getTipo());
+            ps.setString(6, v.getEstado());
+            ps.setInt(7, v.getId()); 
 
             ps.executeUpdate();
             return true;
@@ -115,6 +118,7 @@ public class VehiculoDAO {
                 v.setMarca(rs.getString("marca"));
                 v.setModelo(rs.getString("modelo"));
                 v.setPlaca(rs.getString("placa"));
+                v.setPasajeros(rs.getInt("pasajeros"));
                 v.setTipo(rs.getString("tipo"));
                 v.setEstado(rs.getString("estado"));
                 lista.add(v);

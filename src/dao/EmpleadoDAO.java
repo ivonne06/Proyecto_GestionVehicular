@@ -42,9 +42,9 @@ public class EmpleadoDAO {
     public List<Empleado> listar() {
         List<Empleado> lista = new ArrayList<>();
 
-        String sql = "SELECT e.*, u.username " +
-                     "FROM Empleados e " +
-                     "LEFT JOIN Usuarios u ON e.id_usuario = u.id_usuario";
+        String sql = "SELECT e.*, u.username, u.estado " +
+             "FROM Empleados e " +
+             "LEFT JOIN Usuarios u ON e.id_usuario = u.id_usuario";
 
         try {
             con = Conexion.getConexion();
@@ -61,10 +61,19 @@ public class EmpleadoDAO {
                 emp.setTelefono(rs.getString("telefono"));
                 emp.setCargo(rs.getString("cargo"));
                 emp.setDepartamento(rs.getString("departamento"));
-                emp.setEstado(rs.getString("estado"));
                 emp.setLicencia(rs.getString("licencia"));
 
                 emp.setUsername(rs.getString("username"));
+                
+                Object estadoObj = rs.getObject("estado");
+
+                boolean estado = false;
+
+                if (estadoObj != null) {
+                    estado = rs.getBoolean("estado");
+                }
+
+                emp.setEstado(estado ? "ACTIVO" : "INACTIVO");
 
                 lista.add(emp);
             }
@@ -78,9 +87,9 @@ public class EmpleadoDAO {
     
     // ACTUALIZAR (sin tocar id_usuario)
     public boolean actualizar(Empleado emp) {
-        String sql = "UPDATE Empleados "
-                + "SET nombres=?, apellidos=?, dui=?, telefono=?, cargo=?, departamento=?, licencia=? "
-                + "WHERE id_empleado=?";
+    String sql = "UPDATE Empleados "
+            + "SET nombres=?, apellidos=?, dui=?, telefono=?, cargo=?, departamento=?, licencia=? "
+            + "WHERE id_empleado=?";
 
         try {
             con = Conexion.getConexion();
@@ -92,9 +101,8 @@ public class EmpleadoDAO {
             ps.setString(4, emp.getTelefono());
             ps.setString(5, emp.getCargo());
             ps.setString(6, emp.getDepartamento());
-            ps.setString(7, emp.getEstado());
-            ps.setString(8, emp.getLicencia());
-            ps.setInt(9, emp.getIdEmpleado());
+            ps.setString(7, emp.getLicencia());
+            ps.setInt(8, emp.getIdEmpleado());
 
             ps.executeUpdate();
             return true;
@@ -103,6 +111,54 @@ public class EmpleadoDAO {
             System.out.println("Error al actualizar empleado: " + e);
             return false;
         }
+    }
+    
+    public List<Empleado> buscarPorApellidos(String apellidos) {
+        List<Empleado> lista = new ArrayList<>();
+
+        String sql = "SELECT e.*, u.username, u.estado AS estado_usuario " +
+                     "FROM Empleados e " +
+                     "LEFT JOIN Usuarios u ON e.id_usuario = u.id_usuario " +
+                     "WHERE e.apellidos LIKE ?";
+
+        try {
+            con = Conexion.getConexion();
+            ps = con.prepareStatement(sql);
+            ps.setString(1, "%" + apellidos + "%");
+            rs = ps.executeQuery();
+
+            while (rs.next()) {
+                Empleado emp = new Empleado();
+
+                emp.setIdEmpleado(rs.getInt("id_empleado"));
+                emp.setNombres(rs.getString("nombres"));
+                emp.setApellidos(rs.getString("apellidos"));
+                emp.setDui(rs.getString("dui"));
+                emp.setTelefono(rs.getString("telefono"));
+                emp.setCargo(rs.getString("cargo"));
+                emp.setDepartamento(rs.getString("departamento"));
+                emp.setLicencia(rs.getString("licencia"));
+
+                emp.setUsername(rs.getString("username"));
+
+                // estado desde usuario
+                Object estadoObj = rs.getObject("estado_usuario");
+                boolean estado = false;
+
+                if (estadoObj != null) {
+                    estado = rs.getBoolean("estado_usuario");
+                }
+
+                emp.setEstado(estado ? "ACTIVO" : "INACTIVO");
+
+                lista.add(emp);
+            }
+
+        } catch (Exception e) {
+            System.out.println("Error buscarPorApellidos: " + e);
+        }
+
+        return lista;
     }
     
     public boolean duiExiste(int id, String dui) {

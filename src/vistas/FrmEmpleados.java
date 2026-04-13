@@ -26,6 +26,8 @@ public class FrmEmpleados extends javax.swing.JInternalFrame {
         txtLicencia.setEnabled(false);
         rbNoLicencia.setSelected(true);
         txtLicencia.setText("SIN LICENCIA");
+        btnGuardar.setEnabled(true);
+        btnActualizar.setEnabled(false);
     }
     
 
@@ -63,6 +65,8 @@ public class FrmEmpleados extends javax.swing.JInternalFrame {
         txtIdEmpleado = new javax.swing.JTextField();
         jLabel11 = new javax.swing.JLabel();
         btnActualizar = new javax.swing.JButton();
+        txtBuscar = new javax.swing.JTextField();
+        jLabel7 = new javax.swing.JLabel();
 
         setClosable(true);
         setIconifiable(true);
@@ -150,6 +154,14 @@ public class FrmEmpleados extends javax.swing.JInternalFrame {
             }
         });
 
+        txtBuscar.addKeyListener(new java.awt.event.KeyAdapter() {
+            public void keyReleased(java.awt.event.KeyEvent evt) {
+                txtBuscarKeyReleased(evt);
+            }
+        });
+
+        jLabel7.setText("Buscar por Apellidos: ");
+
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(getContentPane());
         getContentPane().setLayout(layout);
         layout.setHorizontalGroup(
@@ -194,19 +206,25 @@ public class FrmEmpleados extends javax.swing.JInternalFrame {
                                 .addComponent(rbSiLicencia)
                                 .addGap(18, 18, 18)
                                 .addComponent(rbNoLicencia)))
-                        .addGap(115, 115, 115)))
+                        .addGap(115, 115, 115))
+                    .addGroup(layout.createSequentialGroup()
+                        .addGap(264, 264, 264)
+                        .addComponent(jLabel9)
+                        .addGap(0, 0, Short.MAX_VALUE)))
                 .addContainerGap())
             .addGroup(layout.createSequentialGroup()
-                .addGap(264, 264, 264)
-                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
+                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                     .addGroup(layout.createSequentialGroup()
-                        .addComponent(jLabel9)
-                        .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+                        .addGap(68, 68, 68)
+                        .addComponent(jLabel7)
+                        .addGap(18, 18, 18)
+                        .addComponent(txtBuscar, javax.swing.GroupLayout.PREFERRED_SIZE, 425, javax.swing.GroupLayout.PREFERRED_SIZE))
                     .addGroup(layout.createSequentialGroup()
+                        .addGap(313, 313, 313)
                         .addComponent(btnGuardar)
                         .addGap(30, 30, 30)
-                        .addComponent(btnActualizar)
-                        .addGap(439, 439, 439))))
+                        .addComponent(btnActualizar)))
+                .addGap(0, 262, Short.MAX_VALUE))
         );
         layout.setVerticalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
@@ -233,11 +251,7 @@ public class FrmEmpleados extends javax.swing.JInternalFrame {
                         .addGap(18, 18, 18)
                         .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                             .addComponent(jLabel10)
-                            .addComponent(txtLicencia, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
-                        .addGap(72, 72, 72)
-                        .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                            .addComponent(btnGuardar)
-                            .addComponent(btnActualizar)))
+                            .addComponent(txtLicencia, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)))
                     .addGroup(layout.createSequentialGroup()
                         .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                             .addComponent(jLabel1)
@@ -254,7 +268,15 @@ public class FrmEmpleados extends javax.swing.JInternalFrame {
                         .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                             .addComponent(jLabel6)
                             .addComponent(txtDepartamento, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))))
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 50, Short.MAX_VALUE)
+                .addGap(20, 20, 20)
+                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                    .addComponent(btnGuardar)
+                    .addComponent(btnActualizar))
+                .addGap(18, 18, 18)
+                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                    .addComponent(txtBuscar, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addComponent(jLabel7))
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 22, Short.MAX_VALUE)
                 .addComponent(jScrollPane1, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addContainerGap())
         );
@@ -333,6 +355,7 @@ public class FrmEmpleados extends javax.swing.JInternalFrame {
         rbNoLicencia.setSelected(true);
         txtLicencia.setEnabled(false);
         
+        btnGuardar.setEnabled(true);
         btnActualizar.setEnabled(false);
     }
     
@@ -383,6 +406,7 @@ public class FrmEmpleados extends javax.swing.JInternalFrame {
         int fila = tblEmpleados.getSelectedRow();
 
         if (fila == -1) return;
+       
 
         txtIdEmpleado.setText(tblEmpleados.getValueAt(fila, 0).toString());
         txtNombres.setText(tblEmpleados.getValueAt(fila, 1).toString());
@@ -405,6 +429,7 @@ public class FrmEmpleados extends javax.swing.JInternalFrame {
             txtLicencia.setText(lic);
         }
 
+        btnGuardar.setEnabled(false);
         btnActualizar.setEnabled(true);
     }//GEN-LAST:event_tblEmpleadosMouseClicked
 
@@ -462,6 +487,38 @@ public class FrmEmpleados extends javax.swing.JInternalFrame {
         txtLicencia.setText("SIN LICENCIA");
     }//GEN-LAST:event_rbNoLicenciaActionPerformed
 
+    private void txtBuscarKeyReleased(java.awt.event.KeyEvent evt) {//GEN-FIRST:event_txtBuscarKeyReleased
+        int pos = txtBuscar.getCaretPosition();
+
+        txtBuscar.setText(txtBuscar.getText().toUpperCase());
+        txtBuscar.setCaretPosition(pos);
+
+        String apellidos = txtBuscar.getText();
+
+        DefaultTableModel modelo = (DefaultTableModel) tblEmpleados.getModel();
+        modelo.setRowCount(0);
+
+        if (apellidos.isEmpty()) {
+            cargarTabla();
+            return;
+        }
+
+        for (Empleado e : dao.buscarPorApellidos(apellidos)) {
+            modelo.addRow(new Object[]{
+                e.getIdEmpleado(),
+                e.getNombres(),
+                e.getApellidos(),
+                e.getDui(),
+                e.getTelefono(),
+                e.getCargo(),
+                e.getDepartamento(),
+                e.getEstado(),
+                e.getLicencia(),
+                e.getUsername()
+            });
+        }
+    }//GEN-LAST:event_txtBuscarKeyReleased
+
     
     
 
@@ -477,6 +534,7 @@ public class FrmEmpleados extends javax.swing.JInternalFrame {
     private javax.swing.JLabel jLabel4;
     private javax.swing.JLabel jLabel5;
     private javax.swing.JLabel jLabel6;
+    private javax.swing.JLabel jLabel7;
     private javax.swing.JLabel jLabel8;
     private javax.swing.JLabel jLabel9;
     private javax.swing.JScrollPane jScrollPane1;
@@ -484,6 +542,7 @@ public class FrmEmpleados extends javax.swing.JInternalFrame {
     private javax.swing.JRadioButton rbSiLicencia;
     private javax.swing.JTable tblEmpleados;
     private javax.swing.JTextField txtApellidos;
+    private javax.swing.JTextField txtBuscar;
     private javax.swing.JTextField txtCargo;
     private javax.swing.JTextField txtDepartamento;
     private javax.swing.JFormattedTextField txtDui;

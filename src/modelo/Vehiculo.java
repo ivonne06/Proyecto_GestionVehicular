@@ -5,6 +5,7 @@ public class Vehiculo {
     private String marca;
     private String modelo;
     private String placa;
+    private int pasajeros;
     private String tipo;
     private String estado;
 
@@ -13,11 +14,12 @@ public class Vehiculo {
     }
 
     // Constructor con parámetros
-    public Vehiculo(int id, String marca, String modelo, String placa, String tipo, String estado) {
+    public Vehiculo(int id, String marca, String modelo, String placa, int pasajeros, String tipo, String estado) {
         this.id = id;
         this.marca = marca;
         this.modelo = modelo;
         this.placa = placa;
+        this.pasajeros = pasajeros;
         this.tipo = tipo;
         this.estado = estado;
     }
@@ -53,6 +55,14 @@ public class Vehiculo {
 
     public void setPlaca(String placa) {
         this.placa = placa;
+    }
+    
+    public int getPasajeros() {
+        return pasajeros;
+    }
+
+    public void setPasajeros(int pasajeros) {
+        this.pasajeros = pasajeros;
     }
 
     public String getTipo() {

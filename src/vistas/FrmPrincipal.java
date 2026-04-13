@@ -21,6 +21,9 @@ public class FrmPrincipal extends javax.swing.JFrame {
         configurarVentana();
         mostrarMensajeUsuario();
         mostrarUsuarioMenu();
+        validarCambioPassword();
+        aplicarRoles(); 
+
     }
 
     private void configurarVentana() {
@@ -30,7 +33,7 @@ public class FrmPrincipal extends javax.swing.JFrame {
 
     private void mostrarMensajeUsuario() {
         if (userSesion != null) {
-            this.setTitle("Gestión Vehicular | Usuario: " + userSesion.getUsername().toUpperCase());
+            this.setTitle("SGV - Sistema de Gestión Vehicular | " + userSesion.getUsername().toUpperCase());
         }
     }
     
@@ -57,6 +60,60 @@ public class FrmPrincipal extends javax.swing.JFrame {
             (escritorio.getWidth() - frm.getWidth()) / 2,
             (escritorio.getHeight() - frm.getHeight()) / 2
         );
+    }
+    
+    private void validarCambioPassword() {
+        if (userSesion != null && userSesion.isDebeCambiarPassword()){
+
+            JOptionPane.showMessageDialog(
+                this,
+                "Debe cambiar su contraseña antes de continuar",
+                "Cambio obligatorio",
+                JOptionPane.WARNING_MESSAGE
+            );
+
+            FrmCambiarPassword frm = new FrmCambiarPassword(userSesion);
+            abrirFormulario(frm);
+        }
+    }
+    
+        private void aplicarRoles() {
+
+        if (userSesion == null) return;
+
+        String rol = userSesion.getRol();
+
+
+        if (rol.equalsIgnoreCase("ADMIN")) {
+            mItemUsuarios.setVisible(true);
+            mItemEmpleados.setVisible(true);
+            mItemVehiculos.setVisible(true);
+            mItemSolicitudes.setVisible(true);
+            mItemAsignaciones.setVisible(true);
+            mItemReportes.setVisible(true);
+        }
+
+
+        else if (rol.equalsIgnoreCase("ENCARGADO")) {
+            mItemUsuarios.setVisible(false); // no administra usuarios
+            mItemEmpleados.setVisible(false);
+
+            mItemVehiculos.setVisible(true);
+            mItemSolicitudes.setVisible(true);
+            mItemAsignaciones.setVisible(true);
+            mItemReportes.setVisible(false);
+        }
+
+
+        else if (rol.equalsIgnoreCase("EMPLEADO")) {
+            mItemUsuarios.setVisible(false);
+            mItemEmpleados.setVisible(false);
+            mItemVehiculos.setVisible(false);
+            mItemAsignaciones.setVisible(false);
+            mItemReportes.setVisible(false);
+
+            mItemSolicitudes.setVisible(true); 
+        }
     }
 
     /**

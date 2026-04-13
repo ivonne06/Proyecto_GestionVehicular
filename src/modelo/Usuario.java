@@ -15,7 +15,7 @@ public class Usuario {
     private String rol;
     private boolean estado;
     private boolean debeCambiarPassword;
-
+   
     
     private String nombreCompleto;
 

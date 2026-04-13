@@ -34,8 +34,6 @@ public class Seeder {
                 psInsert.executeUpdate();
 
                 System.out.println("Usuario admin creado");
-            } else {
-                System.out.println("El admin ya existe");
             }
 
         } catch (Exception e) {
