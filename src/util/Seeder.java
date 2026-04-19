@@ -1,11 +1,8 @@
-/*
- * Click nbfs://nbhost/SystemFileSystem/Templates/Licenses/license-default.txt to change this license
- * Click nbfs://nbhost/SystemFileSystem/Templates/Classes/Class.java to edit this template
- */
 package util;
 
 import conexion.Conexion;
 import java.sql.*;
+import util.HashUtil;
 
 public class Seeder {
      public static void seedAdmin() {
@@ -26,7 +23,7 @@ public class Seeder {
                 PreparedStatement psInsert = con.prepareStatement(insertQuery);
 
                 psInsert.setString(1, "admin");
-                psInsert.setString(2, "1234");
+                psInsert.setString(2, HashUtil.sha256("1234").toUpperCase());
                 psInsert.setString(3, "ADMIN");
                 psInsert.setInt(4, 1);
                 psInsert.setInt(5, 0);

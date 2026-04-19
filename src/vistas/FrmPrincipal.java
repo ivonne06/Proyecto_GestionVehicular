@@ -3,17 +3,13 @@ package vistas;
 import modelo.Usuario;
 import javax.swing.JInternalFrame;
 import javax.swing.JOptionPane;
+import javax.swing.SwingUtilities;
 
 public class FrmPrincipal extends javax.swing.JFrame {
     
     private static final java.util.logging.Logger logger = java.util.logging.Logger.getLogger(FrmPrincipal.class.getName());
     
      private Usuario userSesion;
-
-    public FrmPrincipal() {
-        initComponents();
-        configurarVentana();
-    }
 
     public FrmPrincipal(Usuario usr) {
         initComponents();
@@ -46,20 +42,25 @@ public class FrmPrincipal extends javax.swing.JFrame {
     }
 
     private void abrirFormulario(JInternalFrame frm) {
-        for (JInternalFrame frame : escritorio.getAllFrames()) {
+         for (JInternalFrame frame : escritorio.getAllFrames()) {
             if (frame.getClass().equals(frm.getClass())) {
                 frame.toFront();
                 frame.requestFocus();
                 return;
             }
         }
-
+         
         escritorio.add(frm);
+        frm.pack();
         frm.setVisible(true);
-        frm.setLocation(
-            (escritorio.getWidth() - frm.getWidth()) / 2,
-            (escritorio.getHeight() - frm.getHeight()) / 2
-        );
+
+        SwingUtilities.invokeLater(() -> centrarFormulario(frm));
+    }
+    
+    private void centrarFormulario(JInternalFrame frm) {
+        int x = (escritorio.getWidth() - frm.getWidth()) / 2;
+        int y = (escritorio.getHeight() - frm.getHeight()) / 2;
+        frm.setLocation(x, y);
     }
     
     private void validarCambioPassword() {
@@ -74,7 +75,10 @@ public class FrmPrincipal extends javax.swing.JFrame {
 
             FrmCambiarPassword frm = new FrmCambiarPassword(userSesion);
             abrirFormulario(frm);
-        }
+            try {
+                frm.setSelected(true);
+            } catch (Exception e) {}
+                    }
     }
     
         private void aplicarRoles() {
@@ -194,6 +198,11 @@ public class FrmPrincipal extends javax.swing.JFrame {
         menuModulo.add(mItemVehiculos);
 
         mItemSolicitudes.setText("Solicitudes");
+        mItemSolicitudes.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                mItemSolicitudesActionPerformed(evt);
+            }
+        });
         menuModulo.add(mItemSolicitudes);
 
         mItemAsignaciones.setText("Asignaciones");
@@ -262,15 +271,24 @@ public class FrmPrincipal extends javax.swing.JFrame {
        abrirFormulario(new FrmUsuarios());
     }//GEN-LAST:event_mItemUsuariosActionPerformed
 
-    
-    /**
-     * @param args the command line arguments
-     */
-    public static void main(String args[]) {
-        java.awt.EventQueue.invokeLater(() -> {
-            new FrmPrincipal().setVisible(true);
-        });
-    }
+    private void mItemSolicitudesActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_mItemSolicitudesActionPerformed
+        String rol = userSesion.getRol().toUpperCase();
+
+        switch (rol) {
+            case "EMPLEADO":
+                abrirFormulario(new FrmSolicitudesEmpleado(userSesion));
+                break;
+
+            case "ENCARGADO":
+            case "ADMIN":
+                abrirFormulario(new FrmSolicitudesAdmin(userSesion));
+                break;
+
+            default:
+                JOptionPane.showMessageDialog(this, "Rol no autorizado");
+        }
+    }//GEN-LAST:event_mItemSolicitudesActionPerformed
+
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JDesktopPane escritorio;

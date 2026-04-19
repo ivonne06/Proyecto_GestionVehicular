@@ -1,7 +1,3 @@
-/*
- * Click nbfs://nbhost/SystemFileSystem/Templates/Licenses/license-default.txt to change this license
- * Click nbfs://nbhost/SystemFileSystem/Templates/GUIForms/JInternalFrame.java to edit this template
- */
 package vistas;
 
 import dao.UsuarioDAO;
@@ -9,10 +5,6 @@ import javax.swing.ImageIcon;
 import javax.swing.JOptionPane;
 import modelo.Usuario;
 
-/**
- *
- * @author walte
- */
 public class FrmCambiarPassword extends javax.swing.JInternalFrame {
  private Usuario userSesion;
     /**
@@ -25,6 +17,10 @@ public class FrmCambiarPassword extends javax.swing.JInternalFrame {
    
         txtPassword.setEchoChar('*');
         txtConfirmar.setEchoChar('*');
+        
+        this.setClosable(false);
+        this.setDefaultCloseOperation(DO_NOTHING_ON_CLOSE);
+
         
         this.addComponentListener(new java.awt.event.ComponentAdapter() {
             @Override
@@ -164,7 +160,7 @@ public class FrmCambiarPassword extends javax.swing.JInternalFrame {
 
         if (ok) {
             JOptionPane.showMessageDialog(this, "Contraseña actualizada");
-
+            userSesion.setDebeCambiarPassword(false); 
             this.dispose(); // cerrar ventana
 
         } else {

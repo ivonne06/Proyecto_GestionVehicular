@@ -1,13 +1,10 @@
-/*
- * Click nbfs://nbhost/SystemFileSystem/Templates/Licenses/license-default.txt to change this license
- * Click nbfs://nbhost/SystemFileSystem/Templates/Classes/Class.java to edit this template
- */
 package dao;
 import conexion.Conexion;
 import modelo.Usuario;
 import java.sql.*;
 import java.util.ArrayList;
 import java.util.List;
+import util.HashUtil;
 
 public class UsuarioDAO {
     Connection con;
@@ -16,15 +13,20 @@ public class UsuarioDAO {
         
     public Usuario login(String user, String pass) {
         Usuario usr = null;
+        
         // Consulta a tabla usuarios
-        String sql = "SELECT id_usuario, username, rol, estado, debe_cambiar_password " +
-                     "FROM Usuarios WHERE username = ? AND password = ?";
+        String sql = "SELECT u.id_usuario, u.username, u.rol, u.estado, u.debe_cambiar_password, " +
+             "e.id_empleado " +
+             "FROM Usuarios u " +
+             "LEFT JOIN Empleados e ON e.id_usuario = u.id_usuario " +
+             "WHERE u.username = ? AND u.password = ?";
 
         try (Connection con = Conexion.getConexion();
              PreparedStatement ps = con.prepareStatement(sql)) {
             
             ps.setString(1, user);
-            ps.setString(2, pass);
+            System.out.println("HASH: " + HashUtil.sha256(pass).toUpperCase());
+            ps.setString(2, HashUtil.sha256(pass).toUpperCase());
             
             try (ResultSet rs = ps.executeQuery()) {
                 if (rs.next()) {
@@ -34,7 +36,11 @@ public class UsuarioDAO {
                     usr.setRol(rs.getString("rol"));
                     // verificar el estado del usuario activo 1, inactivo 0
                     usr.setEstado(rs.getBoolean("estado")); 
+                    
+                    // verifica si el usuario debe cambiar contraseña al primmer loggin si 1, no 0
                     usr.setDebeCambiarPassword(rs.getBoolean("debe_cambiar_password"));
+                    
+                    usr.setIdEmpleado(rs.getInt("id_empleado"));
                 }
             }
         } catch (SQLException e) {
@@ -43,7 +49,7 @@ public class UsuarioDAO {
         return usr;
     }
     
-    // 🔹 LISTAR USUARIOS
+    // LISTAR USUARIOS
     public List<Usuario> listarUsuarios() {
         List<Usuario> lista = new ArrayList<>();
 
@@ -82,7 +88,7 @@ public class UsuarioDAO {
         return lista;
     }
 
-    // 🔹 ACTIVAR
+    // ACTIVAR
     public boolean activar(int id) {
         String sql = "UPDATE Usuarios SET estado = 1 WHERE id_usuario = ?";
         try (Connection con = Conexion.getConexion();
@@ -98,7 +104,7 @@ public class UsuarioDAO {
         }
     }
 
-    // 🔹 DESACTIVAR
+    // DESACTIVAR
     public boolean desactivar(int id) {
         String sql = "UPDATE Usuarios SET estado = 0 WHERE id_usuario = ?";
         try (Connection con = Conexion.getConexion();
@@ -114,7 +120,7 @@ public class UsuarioDAO {
         }
     }
 
-    // 🔹 EDITAR USUARIO
+    // EDITAR USUARIO
     public boolean actualizarRol(int id, String rol) {
         String sql = "UPDATE Usuarios SET rol=? WHERE id_usuario=?";
         try {
@@ -130,24 +136,26 @@ public class UsuarioDAO {
     }
     
     public boolean cambiarPassword(int idUsuario, String nuevaPass) {
-    boolean resp = false;
+        boolean resp = false;
 
-    try {
-        Connection con = Conexion.getConexion();
-        String sql = "UPDATE Usuarios SET password = ?, debe_cambiar_password = 0 WHERE id_usuario = ?";
+        try {
+            Connection con = Conexion.getConexion();
+            String sql = "UPDATE Usuarios SET password = ?, debe_cambiar_password = 0 WHERE id_usuario = ?";
+            
+            String passHash = HashUtil.sha256(nuevaPass).toUpperCase();
+             
+            PreparedStatement ps = con.prepareStatement(sql);
+            ps.setString(1, passHash);
+            ps.setInt(2, idUsuario);
 
-        PreparedStatement ps = con.prepareStatement(sql);
-        ps.setString(1, nuevaPass);
-        ps.setInt(2, idUsuario);
+            resp = ps.executeUpdate() > 0;
 
-        resp = ps.executeUpdate() > 0;
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
 
-    } catch (Exception e) {
-        e.printStackTrace();
+        return resp;
     }
-
-    return resp;
-}
     
 }
 

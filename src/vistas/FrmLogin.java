@@ -1,7 +1,3 @@
-/*
- * Click nbfs://nbhost/SystemFileSystem/Templates/Licenses/license-default.txt to change this license
- * Click nbfs://nbhost/SystemFileSystem/Templates/GUIForms/JFrame.java to edit this template
- */
 package vistas;
 
 
@@ -10,8 +6,6 @@ import javax.swing.JOptionPane;
 import java.sql.Connection;
 import util.Seeder;
 import javax.swing.ImageIcon;
-import java.awt.Image;
-import javax.swing.Icon;
 import javax.swing.SwingConstants;
 
 public class FrmLogin extends javax.swing.JFrame {
