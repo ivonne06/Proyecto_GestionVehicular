@@ -25,7 +25,6 @@ public class UsuarioDAO {
              PreparedStatement ps = con.prepareStatement(sql)) {
             
             ps.setString(1, user);
-            System.out.println("HASH: " + HashUtil.sha256(pass).toUpperCase());
             ps.setString(2, HashUtil.sha256(pass).toUpperCase());
             
             try (ResultSet rs = ps.executeQuery()) {
@@ -157,6 +156,28 @@ public class UsuarioDAO {
         return resp;
     }
     
+    public String obtenerPasswordActual(int idUsuario) {
+        String pass = null;
+
+        try {
+            Connection con = Conexion.getConexion();
+            String sql = "SELECT password FROM Usuarios WHERE id_usuario = ?";
+
+            PreparedStatement ps = con.prepareStatement(sql);
+            ps.setInt(1, idUsuario);
+
+            ResultSet rs = ps.executeQuery();
+
+            if (rs.next()) {
+                pass = rs.getString("password");
+            }
+
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+
+        return pass;
+    }
 }
 
 

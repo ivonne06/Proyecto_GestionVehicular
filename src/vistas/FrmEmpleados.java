@@ -67,6 +67,7 @@ public class FrmEmpleados extends javax.swing.JInternalFrame {
         btnActualizar = new javax.swing.JButton();
         txtBuscar = new javax.swing.JTextField();
         jLabel7 = new javax.swing.JLabel();
+        btnLimpiar1 = new javax.swing.JButton();
 
         setClosable(true);
         setIconifiable(true);
@@ -162,6 +163,13 @@ public class FrmEmpleados extends javax.swing.JInternalFrame {
 
         jLabel7.setText("Buscar por Apellidos: ");
 
+        btnLimpiar1.setText("Limpiar");
+        btnLimpiar1.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                btnLimpiar1ActionPerformed(evt);
+            }
+        });
+
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(getContentPane());
         getContentPane().setLayout(layout);
         layout.setHorizontalGroup(
@@ -223,7 +231,9 @@ public class FrmEmpleados extends javax.swing.JInternalFrame {
                         .addGap(313, 313, 313)
                         .addComponent(btnGuardar)
                         .addGap(30, 30, 30)
-                        .addComponent(btnActualizar)))
+                        .addComponent(btnActualizar)
+                        .addGap(36, 36, 36)
+                        .addComponent(btnLimpiar1)))
                 .addGap(0, 262, Short.MAX_VALUE))
         );
         layout.setVerticalGroup(
@@ -271,14 +281,15 @@ public class FrmEmpleados extends javax.swing.JInternalFrame {
                 .addGap(20, 20, 20)
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                     .addComponent(btnGuardar)
-                    .addComponent(btnActualizar))
+                    .addComponent(btnActualizar)
+                    .addComponent(btnLimpiar1))
                 .addGap(18, 18, 18)
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                     .addComponent(txtBuscar, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                     .addComponent(jLabel7))
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 22, Short.MAX_VALUE)
-                .addComponent(jScrollPane1, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addContainerGap())
+                .addGap(18, 18, 18)
+                .addComponent(jScrollPane1, javax.swing.GroupLayout.PREFERRED_SIZE, 353, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addContainerGap(20, Short.MAX_VALUE))
         );
 
         pack();
@@ -519,6 +530,10 @@ public class FrmEmpleados extends javax.swing.JInternalFrame {
         }
     }//GEN-LAST:event_txtBuscarKeyReleased
 
+    private void btnLimpiar1ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnLimpiar1ActionPerformed
+        limpiar();
+    }//GEN-LAST:event_btnLimpiar1ActionPerformed
+
     
     
 
@@ -526,6 +541,7 @@ public class FrmEmpleados extends javax.swing.JInternalFrame {
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JButton btnActualizar;
     private javax.swing.JButton btnGuardar;
+    private javax.swing.JButton btnLimpiar1;
     private javax.swing.JLabel jLabel1;
     private javax.swing.JLabel jLabel10;
     private javax.swing.JLabel jLabel11;

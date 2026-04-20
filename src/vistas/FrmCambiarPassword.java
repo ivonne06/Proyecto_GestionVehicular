@@ -4,6 +4,7 @@ import dao.UsuarioDAO;
 import javax.swing.ImageIcon;
 import javax.swing.JOptionPane;
 import modelo.Usuario;
+import util.HashUtil;
 
 public class FrmCambiarPassword extends javax.swing.JInternalFrame {
  private Usuario userSesion;
@@ -19,6 +20,7 @@ public class FrmCambiarPassword extends javax.swing.JInternalFrame {
         txtConfirmar.setEchoChar('*');
         
         this.setClosable(false);
+        this.setIconifiable(false);
         this.setDefaultCloseOperation(DO_NOTHING_ON_CLOSE);
 
         
@@ -156,8 +158,19 @@ public class FrmCambiarPassword extends javax.swing.JInternalFrame {
 
         // actualizar en BD
         UsuarioDAO dao = new UsuarioDAO();
-        boolean ok = dao.cambiarPassword(userSesion.getIdUsuario(), pass1);
+                
+        String nuevaHash = HashUtil.sha256(pass1).toUpperCase();
+        String actualHash = dao.obtenerPasswordActual(userSesion.getIdUsuario());
+        
+        // comparar
+        if (nuevaHash.equals(actualHash)) {
+            JOptionPane.showMessageDialog(this, 
+                "La nueva contraseña no puede ser igual a la anterior");
+            return;
+        }
 
+        boolean ok = dao.cambiarPassword(userSesion.getIdUsuario(), pass1);
+        
         if (ok) {
             JOptionPane.showMessageDialog(this, "Contraseña actualizada");
             userSesion.setDebeCambiarPassword(false); 

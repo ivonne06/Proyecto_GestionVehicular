@@ -69,6 +69,7 @@ public class FrmUsuarios extends javax.swing.JInternalFrame {
         txtId = new javax.swing.JLabel();
         btnDesactivar = new javax.swing.JButton();
         btnActivar = new javax.swing.JButton();
+        btnLimpiar = new javax.swing.JButton();
 
         setClosable(true);
         setIconifiable(true);
@@ -128,6 +129,13 @@ public class FrmUsuarios extends javax.swing.JInternalFrame {
             }
         });
 
+        btnLimpiar.setText("Limpiar");
+        btnLimpiar.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                btnLimpiarActionPerformed(evt);
+            }
+        });
+
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(getContentPane());
         getContentPane().setLayout(layout);
         layout.setHorizontalGroup(
@@ -146,7 +154,9 @@ public class FrmUsuarios extends javax.swing.JInternalFrame {
                                 .addGap(18, 18, 18)
                                 .addComponent(btnDesactivar)
                                 .addGap(18, 18, 18)
-                                .addComponent(btnActivar))
+                                .addComponent(btnActivar)
+                                .addGap(18, 18, 18)
+                                .addComponent(btnLimpiar))
                             .addGroup(layout.createSequentialGroup()
                                 .addGap(21, 21, 21)
                                 .addComponent(txtId)
@@ -177,7 +187,8 @@ public class FrmUsuarios extends javax.swing.JInternalFrame {
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                     .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                         .addComponent(btnDesactivar)
-                        .addComponent(btnActivar))
+                        .addComponent(btnActivar)
+                        .addComponent(btnLimpiar))
                     .addComponent(btnActualizar))
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
                 .addComponent(jScrollPane1, javax.swing.GroupLayout.PREFERRED_SIZE, 269, javax.swing.GroupLayout.PREFERRED_SIZE)
@@ -266,11 +277,16 @@ public class FrmUsuarios extends javax.swing.JInternalFrame {
         }
     }//GEN-LAST:event_btnActivarActionPerformed
 
+    private void btnLimpiarActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnLimpiarActionPerformed
+        limpiar();
+    }//GEN-LAST:event_btnLimpiarActionPerformed
+
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JButton btnActivar;
     private javax.swing.JButton btnActualizar;
     private javax.swing.JButton btnDesactivar;
+    private javax.swing.JButton btnLimpiar;
     private javax.swing.JComboBox<String> cmbRol;
     private javax.swing.JLabel jLabel11;
     private javax.swing.JLabel jLabel12;
