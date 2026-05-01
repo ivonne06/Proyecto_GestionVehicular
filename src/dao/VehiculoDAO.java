@@ -11,6 +11,11 @@ public class VehiculoDAO {
 
     // INSERTAR
     public boolean insertar(Vehiculo v) {
+
+        if (v.getEstado().equals("ASIGNADO")) {
+            throw new IllegalArgumentException("No se puede registrar un vehículo como ASIGNADO");
+        }
+
         String sql = "INSERT INTO Vehiculos (marca, modelo, placa, pasajeros, tipo, estado) VALUES (?, ?, ?, ?, ?, ?)";
 
         try (Connection con = Conexion.getConexion();
@@ -60,29 +65,17 @@ public class VehiculoDAO {
         return lista;
     }
 
-    // ELIMINAR
-    public boolean eliminar(int id) {
-        String sql = "DELETE FROM Vehiculos WHERE id_vehiculo=?";
-
-        try (Connection con = Conexion.getConexion();
-             PreparedStatement ps = con.prepareStatement(sql)) {
-
-            ps.setInt(1, id);
-            ps.executeUpdate();
-            return true;
-
-        } catch (SQLException e) {
-            System.out.println("Error eliminar: " + e.getMessage());
-            return false;
-        }
-    }
-
     // ACTUALIZAR
     public boolean actualizar(Vehiculo v) {
-        String sql = "UPDATE Vehiculos SET marca=?, modelo=?, placa=?, pasajeros=?, tipo=?, estado=? WHERE id_vehiculo=?";
+        String sql = "UPDATE Vehiculos SET marca=?, modelo=?, placa=?, pasajeros=?, tipo=?, estado=? "
+                   + "WHERE id_vehiculo=? AND estado IN ('DISPONIBLE', 'MANTENIMIENTO')";
 
         try (Connection con = Conexion.getConexion();
              PreparedStatement ps = con.prepareStatement(sql)) {
+
+            if (placaExiste(v.getId(), v.getPlaca())) {
+                throw new SQLException("La placa ya está registrada");
+            }
 
             ps.setString(1, v.getMarca());
             ps.setString(2, v.getModelo());
@@ -90,13 +83,64 @@ public class VehiculoDAO {
             ps.setInt(4, v.getPasajeros());
             ps.setString(5, v.getTipo());
             ps.setString(6, v.getEstado());
-            ps.setInt(7, v.getId()); 
+            ps.setInt(7, v.getId());
 
-            ps.executeUpdate();
+            int filas = ps.executeUpdate();
+
+            if (filas == 0) {
+                throw new SQLException("No se puede actualizar este vehículo");
+            }
+
             return true;
 
         } catch (SQLException e) {
             System.out.println("Error actualizar: " + e.getMessage());
+            return false;
+        }
+    }
+
+    // INHABILITAR
+    public boolean inhabilitar(int id) {
+        String sql = "UPDATE Vehiculos SET estado='INHABILITADO' WHERE id_vehiculo=? AND estado <> 'ASIGNADO'";
+
+        try (Connection con = Conexion.getConexion();
+             PreparedStatement ps = con.prepareStatement(sql)) {
+
+            ps.setInt(1, id);
+
+            int filas = ps.executeUpdate();
+
+            if (filas == 0) {
+                throw new SQLException("No se puede inhabilitar");
+            }
+
+            return true;
+
+        } catch (SQLException e) {
+            System.out.println("Error inhabilitar: " + e.getMessage());
+            return false;
+        }
+    }
+
+    // HABILITAR
+    public boolean habilitar(int id) {
+        String sql = "UPDATE Vehiculos SET estado='DISPONIBLE' WHERE id_vehiculo=? AND estado='INHABILITADO'";
+
+        try (Connection con = Conexion.getConexion();
+             PreparedStatement ps = con.prepareStatement(sql)) {
+
+            ps.setInt(1, id);
+
+            int filas = ps.executeUpdate();
+
+            if (filas == 0) {
+                throw new SQLException("No se puede habilitar");
+            }
+
+            return true;
+
+        } catch (SQLException e) {
+            System.out.println("Error habilitar: " + e.getMessage());
             return false;
         }
     }
@@ -110,6 +154,7 @@ public class VehiculoDAO {
              PreparedStatement ps = con.prepareStatement(sql)) {
 
             ps.setString(1, "%" + placa + "%");
+
             ResultSet rs = ps.executeQuery();
 
             while (rs.next()) {
@@ -130,10 +175,10 @@ public class VehiculoDAO {
 
         return lista;
     }
-    
-    //Verioficar que la placa sea unica 
+
+    // VALIDAR PLACA ÚNICA
     public boolean placaExiste(int id, String placa) {
-        String sql = "SELECT COUNT(*) FROM Vehiculos WHERE placa = ? AND id_vehiculo <> ?";
+        String sql = "SELECT COUNT(*) FROM Vehiculos WHERE placa=? AND id_vehiculo<>?";
 
         try (Connection con = Conexion.getConexion();
              PreparedStatement ps = con.prepareStatement(sql)) {
@@ -152,5 +197,59 @@ public class VehiculoDAO {
         }
 
         return false;
+    }
+    
+    public Vehiculo buscarPorId(int id) {
+        String sql = "SELECT * FROM Vehiculos WHERE id_vehiculo = ?";
+
+        try (Connection con = Conexion.getConexion();
+             PreparedStatement ps = con.prepareStatement(sql)) {
+
+            ps.setInt(1, id);
+            ResultSet rs = ps.executeQuery();
+
+            if (rs.next()) {
+                Vehiculo v = new Vehiculo();
+                v.setId(rs.getInt("id_vehiculo"));
+                v.setMarca(rs.getString("marca"));
+                v.setModelo(rs.getString("modelo"));
+                v.setPlaca(rs.getString("placa"));
+                v.setPasajeros(rs.getInt("pasajeros"));
+                v.setTipo(rs.getString("tipo"));
+                v.setEstado(rs.getString("estado"));
+                return v;
+            }
+
+        } catch (SQLException e) {
+            System.out.println("Error buscar por id: " + e.getMessage());
+        }
+
+        return null;
+    }
+    
+    public boolean esAsignable(int id) {
+        Vehiculo v = buscarPorId(id);
+
+        return v != null && "DISPONIBLE".equals(v.getEstado());
+    }
+    
+    public boolean asignarVehiculo(int idVehiculo) {
+        if (!esAsignable(idVehiculo)) {
+            return false;
+        }
+
+        String sql = "UPDATE Vehiculos SET estado = 'ASIGNADO' WHERE id_vehiculo = ?";
+
+        try (Connection con = Conexion.getConexion();
+             PreparedStatement ps = con.prepareStatement(sql)) {
+
+            ps.setInt(1, idVehiculo);
+            ps.executeUpdate();
+            return true;
+
+        } catch (SQLException e) {
+            System.out.println("Error asignar: " + e.getMessage());
+            return false;
+        }
     }
 }

@@ -2,6 +2,7 @@ package vistas;
 
 import dao.VehiculoDAO;
 import java.text.ParseException;
+import javax.swing.DefaultComboBoxModel;
 import modelo.Vehiculo;
 import javax.swing.JOptionPane;
 import javax.swing.table.DefaultTableModel;
@@ -17,8 +18,11 @@ public class FrmVehiculos extends javax.swing.JInternalFrame {
      */
     public FrmVehiculos() {
         initComponents();
+        cmbEstado.removeItem("ASIGNADO");
         cargarTabla();
         btnActualizar.setEnabled(false);
+        btnInhabilitar.setEnabled(false);
+        btnHabilitar.setEnabled(false);
     }
 
     /**
@@ -45,13 +49,14 @@ public class FrmVehiculos extends javax.swing.JInternalFrame {
         btnGuardar = new javax.swing.JButton();
         btnActualizar = new javax.swing.JButton();
         btnLimpiar = new javax.swing.JButton();
-        btnEliminar = new javax.swing.JButton();
+        btnInhabilitar = new javax.swing.JButton();
         jScrollPane1 = new javax.swing.JScrollPane();
         tblVehiculos = new javax.swing.JTable();
         jLabel5 = new javax.swing.JLabel();
         txtPlaca = new javax.swing.JFormattedTextField();
         jLabel6 = new javax.swing.JLabel();
         txtPasajeros = new javax.swing.JTextField();
+        btnHabilitar = new javax.swing.JButton();
 
         setClosable(true);
         setIconifiable(true);
@@ -104,10 +109,10 @@ public class FrmVehiculos extends javax.swing.JInternalFrame {
             }
         });
 
-        btnEliminar.setText("Eliminar");
-        btnEliminar.addActionListener(new java.awt.event.ActionListener() {
+        btnInhabilitar.setText("Inhabilitar");
+        btnInhabilitar.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
-                btnEliminarActionPerformed(evt);
+                btnInhabilitarActionPerformed(evt);
             }
         });
 
@@ -144,6 +149,13 @@ public class FrmVehiculos extends javax.swing.JInternalFrame {
 
         jLabel6.setText("Máx. Pasajeros:");
 
+        btnHabilitar.setText("Habilitar");
+        btnHabilitar.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                btnHabilitarActionPerformed(evt);
+            }
+        });
+
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(getContentPane());
         getContentPane().setLayout(layout);
         layout.setHorizontalGroup(
@@ -154,42 +166,46 @@ public class FrmVehiculos extends javax.swing.JInternalFrame {
                 .addGap(0, 6, Short.MAX_VALUE))
             .addGroup(layout.createSequentialGroup()
                 .addGap(42, 42, 42)
-                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING, false)
+                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                     .addGroup(layout.createSequentialGroup()
-                        .addComponent(btnGuardar)
-                        .addGap(84, 84, 84)
-                        .addComponent(btnActualizar)
-                        .addGap(85, 85, 85)
-                        .addComponent(btnLimpiar)
-                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                        .addComponent(btnEliminar))
-                    .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                        .addGroup(layout.createSequentialGroup()
-                            .addComponent(jLabel5)
-                            .addGap(18, 18, 18)
-                            .addComponent(txtBuscar, javax.swing.GroupLayout.PREFERRED_SIZE, 425, javax.swing.GroupLayout.PREFERRED_SIZE))
-                        .addGroup(layout.createSequentialGroup()
-                            .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
-                                .addGroup(layout.createSequentialGroup()
-                                    .addComponent(jLabel6)
-                                    .addGap(18, 18, 18)
-                                    .addComponent(txtPasajeros, javax.swing.GroupLayout.PREFERRED_SIZE, 108, javax.swing.GroupLayout.PREFERRED_SIZE))
-                                .addGroup(layout.createSequentialGroup()
-                                    .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                                        .addComponent(jLabel1)
-                                        .addComponent(jLabel2)
-                                        .addComponent(jLabel4))
-                                    .addGap(18, 18, 18)
-                                    .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING, false)
-                                        .addComponent(txtIdVehiculo, javax.swing.GroupLayout.Alignment.LEADING, javax.swing.GroupLayout.DEFAULT_SIZE, 140, Short.MAX_VALUE)
-                                        .addComponent(txtMarca, javax.swing.GroupLayout.Alignment.LEADING)
-                                        .addComponent(txtModelo, javax.swing.GroupLayout.Alignment.LEADING))))
-                            .addGap(73, 73, 73)
-                            .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                                .addComponent(Tipo)
-                                .addComponent(Tipo1)
-                                .addComponent(jLabel3))
-                            .addGap(18, 18, 18)
+                        .addComponent(jLabel5)
+                        .addGap(18, 18, 18)
+                        .addComponent(txtBuscar, javax.swing.GroupLayout.PREFERRED_SIZE, 425, javax.swing.GroupLayout.PREFERRED_SIZE))
+                    .addGroup(layout.createSequentialGroup()
+                        .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                            .addGroup(layout.createSequentialGroup()
+                                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
+                                    .addGroup(layout.createSequentialGroup()
+                                        .addComponent(jLabel6)
+                                        .addGap(18, 18, 18)
+                                        .addComponent(txtPasajeros, javax.swing.GroupLayout.PREFERRED_SIZE, 108, javax.swing.GroupLayout.PREFERRED_SIZE))
+                                    .addGroup(layout.createSequentialGroup()
+                                        .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                                            .addComponent(jLabel1)
+                                            .addComponent(jLabel2)
+                                            .addComponent(jLabel4))
+                                        .addGap(18, 18, 18)
+                                        .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING, false)
+                                            .addComponent(txtIdVehiculo, javax.swing.GroupLayout.Alignment.LEADING, javax.swing.GroupLayout.DEFAULT_SIZE, 140, Short.MAX_VALUE)
+                                            .addComponent(txtMarca, javax.swing.GroupLayout.Alignment.LEADING)
+                                            .addComponent(txtModelo, javax.swing.GroupLayout.Alignment.LEADING))))
+                                .addGap(73, 73, 73)
+                                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                                    .addComponent(Tipo)
+                                    .addComponent(Tipo1)
+                                    .addComponent(jLabel3)))
+                            .addGroup(layout.createSequentialGroup()
+                                .addComponent(btnGuardar)
+                                .addGap(18, 18, 18)
+                                .addComponent(btnActualizar)
+                                .addGap(33, 33, 33)
+                                .addComponent(btnLimpiar)))
+                        .addGap(18, 18, 18)
+                        .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                            .addGroup(layout.createSequentialGroup()
+                                .addComponent(btnInhabilitar)
+                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                                .addComponent(btnHabilitar))
                             .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
                                 .addComponent(txtPlaca, javax.swing.GroupLayout.DEFAULT_SIZE, 140, Short.MAX_VALUE)
                                 .addComponent(cmbEstado, 0, 140, Short.MAX_VALUE)
@@ -240,8 +256,9 @@ public class FrmVehiculos extends javax.swing.JInternalFrame {
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                     .addComponent(btnGuardar)
                     .addComponent(btnActualizar)
-                    .addComponent(btnEliminar)
-                    .addComponent(btnLimpiar))
+                    .addComponent(btnInhabilitar)
+                    .addComponent(btnLimpiar)
+                    .addComponent(btnHabilitar))
                 .addGap(28, 28, 28)
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                     .addComponent(txtBuscar, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
@@ -283,6 +300,8 @@ public class FrmVehiculos extends javax.swing.JInternalFrame {
         cmbEstado.setSelectedIndex(0);
         btnActualizar.setEnabled(false);
         btnGuardar.setEnabled(true);
+        btnInhabilitar.setEnabled(false);
+        btnHabilitar.setEnabled(false);
     }
     
     private void formatoPlaca() {
@@ -292,6 +311,29 @@ public class FrmVehiculos extends javax.swing.JInternalFrame {
             txtPlaca.setFormatterFactory(new DefaultFormatterFactory(formatter));
         } catch (ParseException e) {
             e.printStackTrace();
+        }
+    }
+    
+    private void gestionarBotones(String estado) {
+        btnGuardar.setEnabled(false);
+        btnActualizar.setEnabled(false);
+        btnInhabilitar.setEnabled(false);
+        btnHabilitar.setEnabled(false);
+
+        switch (estado) {
+            case "INHABILITADO":
+                btnHabilitar.setEnabled(true);
+                break;
+
+            case "ASIGNADO":
+                // ninguno activo
+                break;
+
+            case "DISPONIBLE":
+            case "MANTENIMIENTO":
+                btnActualizar.setEnabled(true);
+                btnInhabilitar.setEnabled(true);
+                break;
         }
     }
     
@@ -310,22 +352,26 @@ public class FrmVehiculos extends javax.swing.JInternalFrame {
         }
 
         // Validar modelo (puede tener letras y números)
-        if (!modelo.matches("[a-zA-Z0-9 ]+")) {
-            throw new Exception("El modelo solo debe contener letras y números.");
+        if (!modelo.matches("[a-zA-Z0-9\\- ]+")) {
+            throw new Exception("El modelo solo debe contener letras, números y guiones.");
         }
+        
+        String estado = cmbEstado.getSelectedItem().toString();
         
         if(cmbTipo.getSelectedIndex() == 0){
             throw new Exception("Debe seleccionar el tipo de vehículo.");
         }
         
-        if(txtPlaca.getText().contains("_")){
-            throw new Exception("Debe completar la placa.");
+        if (estado.equals("ASIGNADO")) {
+            throw new Exception("No puedes asignar un vehículo desde aquí.");
+        }
+
+        if (estado.equals("INHABILITADO")) {
+            throw new Exception("Para inhabilitar use el botón correspondiente.");
         }
        
     }
-    
-    
-    
+           
     private void btnLimpiarActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnLimpiarActionPerformed
         limpiar();
     }//GEN-LAST:event_btnLimpiarActionPerformed
@@ -360,17 +406,29 @@ public class FrmVehiculos extends javax.swing.JInternalFrame {
         }
     }//GEN-LAST:event_btnGuardarActionPerformed
 
-    private void btnEliminarActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnEliminarActionPerformed
+    private void btnInhabilitarActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnInhabilitarActionPerformed
         int fila = tblVehiculos.getSelectedRow();
 
         if (fila == -1) {
-            JOptionPane.showMessageDialog(this, "Seleccione un registro");
+            JOptionPane.showMessageDialog(this, "Seleccione un vehículo");
+            return;
+        }
+
+        String estado = tblVehiculos.getValueAt(fila, 6).toString();
+
+        if (estado.equals("ASIGNADO")) {
+            JOptionPane.showMessageDialog(this, "No se puede inhabilitar un vehículo asignado");
+            return;
+        }
+
+        if (estado.equals("INHABILITADO")) {
+            JOptionPane.showMessageDialog(this, "El vehículo ya está inhabilitado");
             return;
         }
 
         int confirm = JOptionPane.showConfirmDialog(
                 this,
-                "¿Está seguro de eliminar este vehículo?",
+                "¿Desea inhabilitar este vehículo?",
                 "Confirmar",
                 JOptionPane.YES_NO_OPTION
         );
@@ -379,27 +437,39 @@ public class FrmVehiculos extends javax.swing.JInternalFrame {
 
             int id = Integer.parseInt(tblVehiculos.getValueAt(fila, 0).toString());
 
-            if (dao.eliminar(id)) {
-                JOptionPane.showMessageDialog(this, "Eliminado correctamente");
+            if (dao.inhabilitar(id)) {
+                JOptionPane.showMessageDialog(this, "Vehículo inhabilitado correctamente");
                 cargarTabla();
                 limpiar();
+
+                //resetear botones
+                btnInhabilitar.setEnabled(false);
+                btnHabilitar.setEnabled(false);
+
             } else {
-                JOptionPane.showMessageDialog(this, "Error al eliminar");
+                JOptionPane.showMessageDialog(this, "Error al inhabilitar");
             }
         }
-
-    }//GEN-LAST:event_btnEliminarActionPerformed
+    }//GEN-LAST:event_btnInhabilitarActionPerformed
 
     private void btnActualizarActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnActualizarActionPerformed
         try {
             validarCampos();
             int id = Integer.parseInt(txtIdVehiculo.getText());
+            
+            String estadoActual = cmbEstado.getSelectedItem().toString();
+
+            if (estadoActual.equals("ASIGNADO") || estadoActual.equals("INHABILITADO")) {
+                JOptionPane.showMessageDialog(this, "No se puede modificar este vehículo en su estado actual.");
+                return;
+            }
+
             String placa = txtPlaca.getText().toUpperCase();
 
             if (dao.placaExiste(id, placa)) {
                 throw new Exception("La placa ya pertenece a otro vehículo.");
             }
-
+            
             Vehiculo v = new Vehiculo();
 
             v.setId(Integer.parseInt(txtIdVehiculo.getText()));
@@ -425,16 +495,23 @@ public class FrmVehiculos extends javax.swing.JInternalFrame {
 
     private void tblVehiculosMouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_tblVehiculosMouseClicked
         int fila = tblVehiculos.getSelectedRow();
+
         txtIdVehiculo.setText(tblVehiculos.getValueAt(fila, 0).toString());
         txtMarca.setText(tblVehiculos.getValueAt(fila, 1).toString());
         txtModelo.setText(tblVehiculos.getValueAt(fila, 2).toString());
         txtPlaca.setText(tblVehiculos.getValueAt(fila, 3).toString());
         txtPasajeros.setText(tblVehiculos.getValueAt(fila, 4).toString());
         cmbTipo.setSelectedItem(tblVehiculos.getValueAt(fila, 5).toString());
-        cmbEstado.setSelectedItem(tblVehiculos.getValueAt(fila, 6).toString());
-        
-        btnActualizar.setEnabled(true);
-        btnGuardar.setEnabled(false);
+
+        String estado = tblVehiculos.getValueAt(fila, 6).toString();
+
+        if (((DefaultComboBoxModel) cmbEstado.getModel()).getIndexOf("ASIGNADO") == -1) {
+            cmbEstado.addItem("ASIGNADO");
+        }
+
+        cmbEstado.setSelectedItem(estado);
+
+        gestionarBotones(estado);
     }//GEN-LAST:event_tblVehiculosMouseClicked
 
     private void txtBuscarKeyReleased(java.awt.event.KeyEvent evt) {//GEN-FIRST:event_txtBuscarKeyReleased
@@ -472,13 +549,48 @@ public class FrmVehiculos extends javax.swing.JInternalFrame {
         txtPlaca.setCaretPosition(pos);
     }//GEN-LAST:event_txtPlacaKeyReleased
 
+    private void btnHabilitarActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnHabilitarActionPerformed
+         int fila = tblVehiculos.getSelectedRow();
+
+        if (fila == -1) {
+            JOptionPane.showMessageDialog(this, "Seleccione un vehículo");
+            return;
+        }
+
+        int confirm = JOptionPane.showConfirmDialog(
+                this,
+                "¿Desea habilitar este vehículo?",
+                "Confirmar",
+                JOptionPane.YES_NO_OPTION
+        );
+
+        if (confirm == JOptionPane.YES_OPTION) {
+
+            int id = Integer.parseInt(tblVehiculos.getValueAt(fila, 0).toString());
+
+            if (dao.habilitar(id)) {
+                JOptionPane.showMessageDialog(this, "Vehículo habilitado correctamente");
+                cargarTabla();
+                limpiar();
+
+                //resetear botones
+                btnInhabilitar.setEnabled(false);
+                btnHabilitar.setEnabled(false);
+
+            } else {
+                JOptionPane.showMessageDialog(this, "Error al habilitar");
+            }
+        }
+    }//GEN-LAST:event_btnHabilitarActionPerformed
+
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JLabel Tipo;
     private javax.swing.JLabel Tipo1;
     private javax.swing.JButton btnActualizar;
-    private javax.swing.JButton btnEliminar;
     private javax.swing.JButton btnGuardar;
+    private javax.swing.JButton btnHabilitar;
+    private javax.swing.JButton btnInhabilitar;
     private javax.swing.JButton btnLimpiar;
     private javax.swing.JComboBox<String> cmbEstado;
     private javax.swing.JComboBox<String> cmbTipo;
