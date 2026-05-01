@@ -14,8 +14,13 @@ public class SolicitudDao {
 
         List<Object[]> lista = new ArrayList<>();
 
-        String sql = "SELECT id_solicitud, destino, motivo_viaje, motivo_respuesta, pasajeros, fecha_salida, fecha_regreso, estado " +
-                     "FROM Solicitudes WHERE id_empleado=?";
+        String sql = "SELECT s.id_solicitud, s.destino, s.motivo_viaje, s.motivo_respuesta, " +
+             "s.pasajeros, s.fecha_salida, s.fecha_regreso, s.estado, " +
+             "c.id_empleado AS id_conductor, " +
+             "c.nombres + ' ' + c.apellidos AS conductor " +
+             "FROM Solicitudes s " +
+             "LEFT JOIN Empleados c ON s.id_conductor = c.id_empleado " +
+             "WHERE s.id_empleado=?";
 
         try (Connection con = Conexion.getConexion();
              PreparedStatement ps = con.prepareStatement(sql)) {
@@ -40,7 +45,9 @@ public class SolicitudDao {
                     rs.getInt("pasajeros"),
                     rs.getDate("fecha_salida"),
                     rs.getDate("fecha_regreso"),
-                    estado
+                    estado,
+                    rs.getInt("id_conductor"),
+                    rs.getString("conductor") 
                 });
             }
 
@@ -53,17 +60,26 @@ public class SolicitudDao {
     
     public boolean insertar(Solicitud s) {
 
-        String sql = "INSERT INTO Solicitudes (id_empleado, fecha_salida, fecha_regreso, destino, motivo_viaje, pasajeros) VALUES (?, ?, ?, ?, ?, ?)";
+        String sql = "INSERT INTO Solicitudes " +
+                "(id_empleado, id_conductor, fecha_salida, fecha_regreso, destino, motivo_viaje, pasajeros) " +
+                "VALUES (?, ?, ?, ?, ?, ?, ?)";
 
         try (Connection con = Conexion.getConexion();
              PreparedStatement ps = con.prepareStatement(sql)) {
 
             ps.setInt(1, s.getIdEmpleado());
-            ps.setDate(2, new java.sql.Date(s.getFechaSalida().getTime()));
-            ps.setDate(3, new java.sql.Date(s.getFechaRegreso().getTime()));
-            ps.setString(4, s.getDestino());
-            ps.setString(5, s.getMotivoViaje());
-            ps.setInt(6, s.getPasajeros());
+
+            if (s.getIdConductor() == 0) {
+                ps.setNull(2, Types.INTEGER);
+            } else {
+                ps.setInt(2, s.getIdConductor());
+            }
+
+            ps.setDate(3, new java.sql.Date(s.getFechaSalida().getTime()));
+            ps.setDate(4, new java.sql.Date(s.getFechaRegreso().getTime()));
+            ps.setString(5, s.getDestino());
+            ps.setString(6, s.getMotivoViaje());
+            ps.setInt(7, s.getPasajeros());
 
             return ps.executeUpdate() > 0;
 
@@ -76,8 +92,9 @@ public class SolicitudDao {
     // EDITAR SOLO SI PENDIENTE
     public boolean actualizar(Solicitud s) {
 
-        String sql = "UPDATE Solicitudes SET destino=?, motivo_viaje=?, pasajeros=?, fecha_salida=?, fecha_regreso=? " +
-                     "WHERE id_solicitud=? AND id_empleado=? AND estado='PENDIENTE'";
+        String sql = "UPDATE Solicitudes SET destino=?, motivo_viaje=?, pasajeros=?, " +
+             "fecha_salida=?, fecha_regreso=?, id_conductor=? " +
+             "WHERE id_solicitud=? AND id_empleado=? AND estado='PENDIENTE'";
 
         try (Connection con = Conexion.getConexion();
              PreparedStatement ps = con.prepareStatement(sql)) {
@@ -87,8 +104,9 @@ public class SolicitudDao {
             ps.setInt(3, s.getPasajeros());
             ps.setDate(4, new java.sql.Date(s.getFechaSalida().getTime()));
             ps.setDate(5, new java.sql.Date(s.getFechaRegreso().getTime()));
-            ps.setInt(6, s.getId());
-            ps.setInt(7, s.getIdEmpleado());
+            ps.setInt(6, s.getIdConductor());
+            ps.setInt(7, s.getId());
+            ps.setInt(8, s.getIdEmpleado());
 
             return ps.executeUpdate() > 0;
 
@@ -118,10 +136,113 @@ public class SolicitudDao {
             return false;
         }
     }
-
     
-    // ROL ENCARGADO
+    public String obtenerNombreEmpleado(int idEmpleado) {
+        String sql = "SELECT nombres, apellidos FROM Empleados WHERE id_empleado = ?";
 
+        try (Connection con = Conexion.getConexion();
+             PreparedStatement ps = con.prepareStatement(sql)) {
+
+            ps.setInt(1, idEmpleado);
+            ResultSet rs = ps.executeQuery();
+
+            if (rs.next()) {
+                return rs.getString("nombres") + " " + rs.getString("apellidos");
+            }
+
+        } catch (SQLException e) {
+            System.out.println("Error nombre empleado: " + e.getMessage());
+        }
+
+        return "";
+    }
+    
+    //VERIFICA SI EMPLEADO TIENE LICENCIA
+    public boolean empleadoTieneLicencia(int idEmpleado) {
+        String sql = "SELECT licencia FROM Empleados WHERE id_empleado = ?";
+
+        try (Connection con = Conexion.getConexion();
+             PreparedStatement ps = con.prepareStatement(sql)) {
+
+            ps.setInt(1, idEmpleado);
+            ResultSet rs = ps.executeQuery();
+
+            if (rs.next()) {
+                String licencia = rs.getString("licencia");
+                return licencia != null && !licencia.equalsIgnoreCase("SIN LICENCIA");
+            }
+
+        } catch (SQLException e) {
+            System.out.println("Error licencia: " + e.getMessage());
+        }
+
+        return false;
+    }
+    
+    public Object[] buscarConductor(String filtro) {
+
+        String sql = "SELECT id_empleado, nombres, apellidos FROM Empleados " +
+                     "WHERE (nombres LIKE ? OR dui LIKE ?) " +
+                     "AND licencia IS NOT NULL AND licencia <> 'SIN LICENCIA'";
+
+        try (Connection con = Conexion.getConexion();
+             PreparedStatement ps = con.prepareStatement(sql)) {
+
+            ps.setString(1, "%" + filtro + "%");
+            ps.setString(2, "%" + filtro + "%");
+
+            ResultSet rs = ps.executeQuery();
+
+            if (rs.next()) {
+                return new Object[]{
+                    rs.getInt("id_empleado"),
+                    rs.getString("nombres") + " " + rs.getString("apellidos")
+                };
+            }
+
+        } catch (SQLException e) {
+            System.out.println("Error buscar conductor: " + e.getMessage());
+        }
+
+        return null;
+    }
+    
+    public List<Object[]> listarConductores(String filtro) {
+
+        List<Object[]> lista = new ArrayList<>();
+
+        String sql = "SELECT id_empleado, nombres + ' ' + apellidos AS nombre, dui " +
+                     "FROM Empleados " +
+                     "WHERE licencia IS NOT NULL AND licencia <> 'SIN LICENCIA' " +
+                     "AND (nombres LIKE ? OR dui LIKE ?)";
+
+        try (Connection con = Conexion.getConexion();
+             PreparedStatement ps = con.prepareStatement(sql)) {
+
+            ps.setString(1, "%" + filtro + "%");
+            ps.setString(2, "%" + filtro + "%");
+
+            ResultSet rs = ps.executeQuery();
+
+            while (rs.next()) {
+                lista.add(new Object[]{
+                    rs.getInt("id_empleado"),
+                    rs.getString("nombre"),
+                    rs.getString("dui")
+                });
+            }
+
+        } catch (SQLException e) {
+            System.out.println("Error listar conductores: " + e.getMessage());
+        }
+
+        return lista;
+    }
+
+    //==============================
+    //= ROL ENCARGADO              =
+    //==============================
+    
     // LISTAR TODAS
     public List<Object[]> listarTodas() {
 

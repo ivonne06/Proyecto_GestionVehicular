@@ -5,6 +5,7 @@ import java.util.Date;
 public class Solicitud {
     private int id;
     private int idEmpleado;
+    private int idConductor;
     private Date fechaSalida;
     private Date fechaRegreso;
     private String destino;
@@ -16,12 +17,10 @@ public class Solicitud {
     
     public Solicitud() {}
 
-    public Solicitud(int id, int idEmpleado, Date fechaSalida, Date fechaRegreso,
-                     String destino, String motivoViaje, String motivoRespuesta,
-                     int pasajeros, String estado) {
-
+    public Solicitud(int id, int idEmpleado, int idConductor, Date fechaSalida, Date fechaRegreso, String destino, String motivoViaje, String motivoRespuesta, int pasajeros, String estado, Date fechaEstado) {
         this.id = id;
         this.idEmpleado = idEmpleado;
+        this.idConductor = idConductor;
         this.fechaSalida = fechaSalida;
         this.fechaRegreso = fechaRegreso;
         this.destino = destino;
@@ -29,6 +28,7 @@ public class Solicitud {
         this.motivoRespuesta = motivoRespuesta;
         this.pasajeros = pasajeros;
         this.estado = estado;
+        this.fechaEstado = fechaEstado;
     }
     
     public int getId() {
@@ -49,6 +49,14 @@ public class Solicitud {
 
     public Date getFechaSalida() {
         return fechaSalida;
+    }
+    
+        public int getIdConductor() {
+        return idConductor;
+    }
+
+    public void setIdConductor(int idConductor) {
+        this.idConductor = idConductor;
     }
 
     public void setFechaSalida(Date fechaSalida) {
