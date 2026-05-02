@@ -23,9 +23,9 @@ public class FrmEmpleados extends javax.swing.JInternalFrame {
         grupoLicencia.add(rbSiLicencia);
         grupoLicencia.add(rbNoLicencia);
         
-        txtLicencia.setEnabled(false);
         rbNoLicencia.setSelected(true);
-        txtLicencia.setText("SIN LICENCIA");
+        cmbLicencia.setEnabled(false);
+        cmbLicencia.setSelectedItem("SIN LICENCIA");
         btnGuardar.setEnabled(true);
         btnActualizar.setEnabled(false);
     }
@@ -59,7 +59,6 @@ public class FrmEmpleados extends javax.swing.JInternalFrame {
         tblEmpleados = new javax.swing.JTable();
         rbSiLicencia = new javax.swing.JRadioButton();
         rbNoLicencia = new javax.swing.JRadioButton();
-        txtLicencia = new javax.swing.JTextField();
         jLabel10 = new javax.swing.JLabel();
         btnGuardar = new javax.swing.JButton();
         txtIdEmpleado = new javax.swing.JTextField();
@@ -68,6 +67,7 @@ public class FrmEmpleados extends javax.swing.JInternalFrame {
         txtBuscar = new javax.swing.JTextField();
         jLabel7 = new javax.swing.JLabel();
         btnLimpiar1 = new javax.swing.JButton();
+        cmbLicencia = new javax.swing.JComboBox<>();
 
         setClosable(true);
         setIconifiable(true);
@@ -170,6 +170,8 @@ public class FrmEmpleados extends javax.swing.JInternalFrame {
             }
         });
 
+        cmbLicencia.setModel(new javax.swing.DefaultComboBoxModel<>(new String[] { "SIN LICENCIA", "PARTICULAR", "LIVIANA", "PESADA" }));
+
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(getContentPane());
         getContentPane().setLayout(layout);
         layout.setHorizontalGroup(
@@ -195,19 +197,19 @@ public class FrmEmpleados extends javax.swing.JInternalFrame {
                             .addComponent(txtNombres, javax.swing.GroupLayout.PREFERRED_SIZE, 140, javax.swing.GroupLayout.PREFERRED_SIZE)
                             .addComponent(txtDepartamento, javax.swing.GroupLayout.PREFERRED_SIZE, 140, javax.swing.GroupLayout.PREFERRED_SIZE))
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                        .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                        .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
                             .addGroup(layout.createSequentialGroup()
                                 .addComponent(jLabel10)
-                                .addGap(36, 36, 36)
-                                .addComponent(txtLicencia, javax.swing.GroupLayout.PREFERRED_SIZE, 140, javax.swing.GroupLayout.PREFERRED_SIZE))
+                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
+                                .addComponent(cmbLicencia, 0, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
                             .addGroup(layout.createSequentialGroup()
                                 .addComponent(jLabel5, javax.swing.GroupLayout.PREFERRED_SIZE, 75, javax.swing.GroupLayout.PREFERRED_SIZE)
                                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                                .addComponent(txtDui, javax.swing.GroupLayout.PREFERRED_SIZE, 140, javax.swing.GroupLayout.PREFERRED_SIZE))
+                                .addComponent(txtDui))
                             .addGroup(layout.createSequentialGroup()
                                 .addComponent(jLabel4, javax.swing.GroupLayout.PREFERRED_SIZE, 75, javax.swing.GroupLayout.PREFERRED_SIZE)
                                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                                .addComponent(txtTelefono, javax.swing.GroupLayout.PREFERRED_SIZE, 140, javax.swing.GroupLayout.PREFERRED_SIZE))
+                                .addComponent(txtTelefono))
                             .addGroup(layout.createSequentialGroup()
                                 .addComponent(jLabel8)
                                 .addGap(18, 18, 18)
@@ -261,7 +263,7 @@ public class FrmEmpleados extends javax.swing.JInternalFrame {
                         .addGap(18, 18, 18)
                         .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                             .addComponent(jLabel10)
-                            .addComponent(txtLicencia, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)))
+                            .addComponent(cmbLicencia, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)))
                     .addGroup(layout.createSequentialGroup()
                         .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                             .addComponent(jLabel1)
@@ -361,10 +363,11 @@ public class FrmEmpleados extends javax.swing.JInternalFrame {
         txtDepartamento.setText("");
         txtDui.setText("");
         txtTelefono.setText("");
-        txtLicencia.setText("");
-
+        
         rbNoLicencia.setSelected(true);
-        txtLicencia.setEnabled(false);
+        cmbLicencia.setEnabled(false);
+        cmbLicencia.setSelectedItem("SIN LICENCIA");
+
         
         btnGuardar.setEnabled(true);
         btnActualizar.setEnabled(false);
@@ -381,16 +384,15 @@ public class FrmEmpleados extends javax.swing.JInternalFrame {
                 throw new Exception("DUI ya existe.");
             }
             
-            String licencia;
-            if (rbSiLicencia.isSelected()) {
-                licencia = txtLicencia.getText().trim();
+            String licencia = cmbLicencia.getSelectedItem().toString();
 
-                if (licencia.isEmpty()) {
-                    throw new Exception("Debe ingresar el número de licencia.");
-                }
-            } else {
+            if (rbSiLicencia.isSelected() && "SIN LICENCIA".equals(licencia)) {
+                throw new Exception("Debe seleccionar un tipo de licencia.");
+            }
+
+            if (rbNoLicencia.isSelected()) {
                 licencia = "SIN LICENCIA";
-            } 
+            }
 
             Empleado e = new Empleado();
 
@@ -432,12 +434,12 @@ public class FrmEmpleados extends javax.swing.JInternalFrame {
         // Licencia
         if ("SIN LICENCIA".equals(lic)) {
             rbNoLicencia.setSelected(true);
-            txtLicencia.setEnabled(false);
-            txtLicencia.setText("SIN LICENCIA");
+            cmbLicencia.setEnabled(false);
+            cmbLicencia.setSelectedItem("SIN LICENCIA");
         } else {
             rbSiLicencia.setSelected(true);
-            txtLicencia.setEnabled(true);
-            txtLicencia.setText(lic);
+            cmbLicencia.setEnabled(true);
+            cmbLicencia.setSelectedItem(lic);
         }
 
         btnGuardar.setEnabled(false);
@@ -454,15 +456,14 @@ public class FrmEmpleados extends javax.swing.JInternalFrame {
             if (dao.duiExiste(id, dui)) {
                 throw new Exception("DUI ya existe.");
             }
+            
+            String licencia = cmbLicencia.getSelectedItem().toString();
 
-            String licencia;
-            if (rbSiLicencia.isSelected()) {
-                licencia = txtLicencia.getText().trim();
+            if (rbSiLicencia.isSelected() && "SIN LICENCIA".equals(licencia)) {
+                throw new Exception("Debe seleccionar un tipo de licencia.");
+            }
 
-                if (licencia.isEmpty()) {
-                    throw new Exception("Debe ingresar el número de licencia.");
-                }
-            } else {
+            if (rbNoLicencia.isSelected()) {
                 licencia = "SIN LICENCIA";
             }
 
@@ -489,13 +490,17 @@ public class FrmEmpleados extends javax.swing.JInternalFrame {
     }//GEN-LAST:event_btnActualizarActionPerformed
 
     private void rbSiLicenciaActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_rbSiLicenciaActionPerformed
-        txtLicencia.setEnabled(true);
-        txtLicencia.setText("");
+        cmbLicencia.setEnabled(true);
+
+        // evitar que quede en SIN LICENCIA
+        if ("SIN LICENCIA".equals(cmbLicencia.getSelectedItem())) {
+            cmbLicencia.setSelectedItem("PARTICULAR");
+        }
     }//GEN-LAST:event_rbSiLicenciaActionPerformed
 
     private void rbNoLicenciaActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_rbNoLicenciaActionPerformed
-        txtLicencia.setEnabled(false);
-        txtLicencia.setText("SIN LICENCIA");
+        cmbLicencia.setEnabled(false);
+        cmbLicencia.setSelectedItem("SIN LICENCIA");
     }//GEN-LAST:event_rbNoLicenciaActionPerformed
 
     private void txtBuscarKeyReleased(java.awt.event.KeyEvent evt) {//GEN-FIRST:event_txtBuscarKeyReleased
@@ -542,6 +547,7 @@ public class FrmEmpleados extends javax.swing.JInternalFrame {
     private javax.swing.JButton btnActualizar;
     private javax.swing.JButton btnGuardar;
     private javax.swing.JButton btnLimpiar1;
+    private javax.swing.JComboBox<String> cmbLicencia;
     private javax.swing.JLabel jLabel1;
     private javax.swing.JLabel jLabel10;
     private javax.swing.JLabel jLabel11;
@@ -563,7 +569,6 @@ public class FrmEmpleados extends javax.swing.JInternalFrame {
     private javax.swing.JTextField txtDepartamento;
     private javax.swing.JFormattedTextField txtDui;
     private javax.swing.JTextField txtIdEmpleado;
-    private javax.swing.JTextField txtLicencia;
     private javax.swing.JTextField txtNombres;
     private javax.swing.JFormattedTextField txtTelefono;
     // End of variables declaration//GEN-END:variables
