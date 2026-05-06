@@ -4,6 +4,16 @@
 -- ======================================================
 
 -- =========================
+-- CREACIÓN BD
+-- =========================
+
+CREATE DATABASE BD_GestionVehicular;
+GO
+
+USE BD_GestionVehicular;
+GO
+
+-- =========================
 -- USUARIOS
 -- =========================
 
@@ -105,18 +115,18 @@ CREATE TABLE Solicitudes (
         CHECK (fecha_regreso >= fecha_salida),
 
     CONSTRAINT chk_solicitudes_estado 
-        CHECK (estado IN ('PENDIENTE', 'APROBADA', 'RECHAZADA', 'FINALIZADA', 'CANCELADA')),
+        CHECK (estado IN ('PENDIENTE', 'APROBADA', 'ASIGNADA', 'RECHAZADA', 'FINALIZADA', 'CANCELADA')),
 
     CONSTRAINT chk_solicitudes_motivo_respuesta 
         CHECK (
             (estado = 'PENDIENTE' AND motivo_respuesta IS NULL)
             OR
-            (estado IN ('APROBADA', 'RECHAZADA', 'CANCELADA') 
+            (estado IN ('APROBADA', 'ASIGNADA', 'RECHAZADA', 'CANCELADA') 
                 AND motivo_respuesta IS NOT NULL 
                 AND LTRIM(RTRIM(motivo_respuesta)) <> '')
         ),
 
-	-- PK
+    -- PK
     CONSTRAINT pk_solicitudes PRIMARY KEY (id_solicitud),
 
     -- FK
@@ -186,6 +196,9 @@ CREATE TABLE UsoVehiculo (
 -- =========================
 
 -- CREAR USUARIO AUTOMATICO
+DROP TRIGGER IF EXISTS trg_crear_usuario_empleado;
+GO
+
 GO
 CREATE TRIGGER trg_crear_usuario_empleado
 ON Empleados
@@ -235,6 +248,9 @@ END;
 
 
 -- BLOQUEAR CAMBIO DE USUARIO
+DROP TRIGGER IF EXISTS trg_no_cambiar_usuario;
+GO
+
 GO
 CREATE TRIGGER trg_no_cambiar_usuario
 ON Empleados
@@ -273,19 +289,30 @@ END;
 
 
 -- CAMBIAR ESTADO VEHICULO A ASIGNADO
+DROP TRIGGER IF EXISTS trg_solicitud_asignada;
 GO
-CREATE TRIGGER trg_asignar_vehiculo
+
+GO
+CREATE TRIGGER trg_solicitud_asignada
 ON Asignaciones
 AFTER INSERT
 AS
 BEGIN
-    UPDATE Vehiculos
-    SET estado = 'ASIGNADO'
-    WHERE id_vehiculo IN (SELECT id_vehiculo FROM inserted);
-END;
+    SET NOCOUNT ON;
 
+    -- Actualizar estado de la solicitud a ASIGNADA
+    UPDATE s
+    SET s.estado = 'ASIGNADA'
+    FROM Solicitudes s
+    INNER JOIN inserted i 
+        ON s.id_solicitud = i.id_solicitud;
+END;
+GO
 
 -- DEVOLUCION VEHICULO
+DROP TRIGGER IF EXISTS trg_devolucion;
+GO
+
 GO
 CREATE TRIGGER trg_devolucion
 ON UsoVehiculo
@@ -310,6 +337,157 @@ BEGIN
         JOIN inserted i ON a.id_asignacion = i.id_asignacion
     );
 END;
+GO
+
+-- =====================================================
+-- PROCEDIMIENTO ALMACENADO
+-- =====================================================
+
+-- =========================================
+-- SP: ASIGNAR VEHICULO
+-- =========================================
+
+IF OBJECT_ID('dbo.sp_asignar_vehiculo', 'P') IS NOT NULL
+    DROP PROCEDURE dbo.sp_asignar_vehiculo;
+GO
+
+CREATE PROCEDURE dbo.sp_asignar_vehiculo
+    @id_solicitud INT,
+    @id_vehiculo INT,
+    @id_usuario_asigno INT
+AS
+BEGIN
+    SET NOCOUNT ON;
+
+    DECLARE 
+        @estado_solicitud VARCHAR(20),
+        @fecha_salida DATE,
+        @fecha_regreso DATE,
+        @pasajeros_solicitud INT,
+        @capacidad_vehiculo INT;
+
+    -- =========================
+    -- VALIDAR SOLICITUD
+    -- =========================
+    SELECT 
+        @estado_solicitud = estado,
+        @fecha_salida = fecha_salida,
+        @fecha_regreso = fecha_regreso,
+        @pasajeros_solicitud = pasajeros
+    FROM Solicitudes
+    WHERE id_solicitud = @id_solicitud;
+
+    IF @estado_solicitud IS NULL
+    BEGIN
+        RAISERROR('La solicitud no existe',16,1);
+        RETURN;
+    END
+
+    IF @estado_solicitud <> 'APROBADA'
+    BEGIN
+        RAISERROR('La solicitud no está aprobada',16,1);
+        RETURN;
+    END
+
+    -- =========================
+    -- VALIDAR VEHICULO
+    -- =========================
+    SELECT 
+        @capacidad_vehiculo = pasajeros
+    FROM Vehiculos
+    WHERE id_vehiculo = @id_vehiculo;
+
+    IF @capacidad_vehiculo IS NULL
+    BEGIN
+        RAISERROR('Vehículo no existe',16,1);
+        RETURN;
+    END
+
+    -- VALIDAR CAPACIDAD
+    IF @capacidad_vehiculo < @pasajeros_solicitud
+    BEGIN
+        RAISERROR('Capacidad insuficiente',16,1);
+        RETURN;
+    END
+
+    -- VALIDAR DISPONIBILIDAD (FECHAS)
+    IF EXISTS (
+        SELECT 1
+        FROM Asignaciones a
+        JOIN Solicitudes s ON a.id_solicitud = s.id_solicitud
+        WHERE a.id_vehiculo = @id_vehiculo
+        AND s.estado IN ('APROBADA', 'ASIGNADA')
+        AND NOT (
+            s.fecha_regreso < @fecha_salida
+            OR
+            s.fecha_salida > @fecha_regreso
+        )
+    )
+    BEGIN
+        RAISERROR('Vehículo no disponible en ese rango de fechas',16,1);
+        RETURN;
+    END
+
+    -- VALIDAR QUE NO ESTÉ YA ASIGNADA
+    IF EXISTS (
+        SELECT 1 FROM Asignaciones 
+        WHERE id_solicitud = @id_solicitud
+    )
+    BEGIN
+        RAISERROR('La solicitud ya tiene un vehículo asignado',16,1);
+        RETURN;
+    END
+
+    -- INSERTAR ASIGNACION
+    INSERT INTO Asignaciones(id_solicitud, id_vehiculo, id_usuario_asigno)
+    VALUES(@id_solicitud, @id_vehiculo, @id_usuario_asigno);
+
+END;
+GO
+
+-- =========================================
+-- SP: VEHICULO DISPONIBLES V2
+-- =========================================
+
+IF OBJECT_ID('dbo.sp_vehiculos_disponibles_v2', 'P') IS NOT NULL
+    DROP PROCEDURE dbo.sp_asignar_vehiculo;
+GO
+
+GO
+
+CREATE PROCEDURE sp_vehiculos_disponibles_v2
+    @fecha_salida DATE,
+    @fecha_regreso DATE,
+    @pasajeros INT
+AS
+BEGIN
+    SET NOCOUNT ON;
+
+    SELECT 
+        v.id_vehiculo,
+        v.marca,
+        v.modelo,
+        v.placa,
+        v.pasajeros,
+        v.tipo
+    FROM Vehiculos v
+    WHERE v.pasajeros >= @pasajeros
+    AND v.estado NOT IN ('MANTENIMIENTO', 'INHABILITADO')
+
+    AND NOT EXISTS (
+        SELECT 1
+        FROM Asignaciones a
+        JOIN Solicitudes s ON a.id_solicitud = s.id_solicitud
+        WHERE a.id_vehiculo = v.id_vehiculo
+        AND s.estado IN ('APROBADA', 'ASIGNADA')
+        AND NOT (
+            s.fecha_regreso < @fecha_salida
+            OR
+            s.fecha_salida > @fecha_regreso
+        )
+    );
+END;
+GO
 
 -- ======================================================
 --  DATOS DE PRUEBA (SEEDERS)
@@ -365,25 +543,27 @@ VALUES
 -- Regla 2: Si el solicitante tiene licencia, se pone él mismo; si no, se asigna otro conductor.
 
 INSERT INTO Solicitudes 
-(id_empleado, id_conductor, fecha_salida, fecha_regreso, destino, motivo_viaje, pasajeros, estado)
+(id_empleado, id_conductor, fecha_salida, fecha_regreso, destino, motivo_viaje, motivo_respuesta, pasajeros, estado)
 VALUES
 -- Maria (tiene licencia, ella conduce)
-(1, 1, '2026-06-05', '2026-06-07', 'San Miguel', 'Distribución de suministros', 1, 'PENDIENTE'),
+(1, 1, '2026-06-05', '2026-06-07', 'San Miguel', 'Distribución de suministros', NULL, 1, 'PENDIENTE'),
 
 -- Jose (tiene licencia, el conduce)
-(2, 2, '2026-06-08', '2026-06-09', 'Usulután', 'Entrega de repuestos', 2, 'PENDIENTE'),
+(2, 2, '2026-06-08', '2026-06-09', 'Usulután', 'Entrega de repuestos', NULL, 2, 'PENDIENTE'),
 
 -- Ana (Sin licencia, Maria conduce)
-(3, 1, '2026-06-10', '2026-06-10', 'Santa Ana', 'Visita técnica', 1, 'PENDIENTE'),
+(3, 1, '2026-06-10', '2026-06-10', 'Santa Ana', 'Visita técnica', NULL, 1, 'PENDIENTE'),
 
 -- Carlos (Sin licencia, Jose conduce)
-(7, 2, '2026-06-12', '2026-06-13', 'Ahuachapán', 'Entrega de documentos', 2, 'PENDIENTE'),
+(7, 2, '2026-06-12', '2026-06-13', 'Ahuachapán', 'Entrega de documentos', NULL, 2, 'PENDIENTE'),
 
 -- Carlos otra (Sin licencia, Luis conduce)
-(7, 5, '2026-06-20', '2026-06-21', 'Sonsonate', 'Revisión de clientes', 3, 'PENDIENTE'),
+(7, 5, '2026-06-20', '2026-06-21', 'Sonsonate', 'Revisión de clientes', NULL, 3, 'PENDIENTE'),
 
 -- Luis (tiene licencia, el conduce)
-(5, 5, '2026-06-15', '2026-06-16', 'La Libertad', 'Supervisión de rutas', 2, 'PENDIENTE');
+(5, 5, '2026-06-15', '2026-06-16', 'La Libertad', 'Supervisión de rutas', NULL, 2, 'PENDIENTE');
 
 GO
-SELECT 'Seeders cargados con éxito' as Mensaje;
+SELECT 'Seeders cargados con éxito' as Mensaje;-- ======================================================
+
+select * from Solicitudes
