@@ -47,8 +47,8 @@ El sistema se apoya en la base de datos `BD_GestionVehicular`, la cual incluye:
 ## 👤 Desarrolladores
 
 *   **Nombres:**
-*   *    Ivonne Delgado
-*   *    Himer Gonzalez
-*   *    Jose Segura
+   *    Ivonne Delgado
+   *    Himer Gonzalez
+   *    Jose Segura
 *   **Institución:** Universidad Tecnológica de El Salvador (UTEC)
 *   **Carrera:** Ingeniería en Sistemas y Computación
