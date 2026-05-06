@@ -264,7 +264,7 @@ public class FrmPrincipal extends javax.swing.JFrame {
     }//GEN-LAST:event_mItemSesionActionPerformed
 
     private void mItemAsignacionesActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_mItemAsignacionesActionPerformed
-        // TODO add your handling code here:
+    abrirFormulario(new FrmAsignacionVehiculos(userSesion));
     }//GEN-LAST:event_mItemAsignacionesActionPerformed
 
     private void mItemUsuariosActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_mItemUsuariosActionPerformed

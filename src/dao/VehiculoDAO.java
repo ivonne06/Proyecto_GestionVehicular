@@ -226,30 +226,66 @@ public class VehiculoDAO {
 
         return null;
     }
-    
-    public boolean esAsignable(int id) {
-        Vehiculo v = buscarPorId(id);
+  
+    public List<Vehiculo> listarDisponibles(java.util.Date salida, java.util.Date regreso, int pasajeros) {
 
-        return v != null && "DISPONIBLE".equals(v.getEstado());
-    }
-    
-    public boolean asignarVehiculo(int idVehiculo) {
-        if (!esAsignable(idVehiculo)) {
-            return false;
+    List<Vehiculo> lista = new ArrayList<>();
+
+  String sql = "{CALL sp_vehiculos_disponibles_v2(?, ?, ?)}";
+
+    try (Connection con = Conexion.getConexion();
+         CallableStatement cs = con.prepareCall(sql)) {
+
+        cs.setDate(1, new java.sql.Date(salida.getTime()));
+        cs.setDate(2, new java.sql.Date(regreso.getTime()));
+        cs.setInt(3, pasajeros);
+
+        ResultSet rs = cs.executeQuery();
+
+        while (rs.next()) {
+            Vehiculo v = new Vehiculo();
+            v.setId(rs.getInt("id_vehiculo"));
+            v.setMarca(rs.getString("marca"));
+            v.setModelo(rs.getString("modelo"));
+            v.setPlaca(rs.getString("placa"));
+            v.setPasajeros(rs.getInt("pasajeros"));
+            v.setTipo(rs.getString("tipo"));
+
+            lista.add(v);
         }
 
-        String sql = "UPDATE Vehiculos SET estado = 'ASIGNADO' WHERE id_vehiculo = ?";
-
-        try (Connection con = Conexion.getConexion();
-             PreparedStatement ps = con.prepareStatement(sql)) {
-
-            ps.setInt(1, idVehiculo);
-            ps.executeUpdate();
-            return true;
-
-        } catch (SQLException e) {
-            System.out.println("Error asignar: " + e.getMessage());
-            return false;
-        }
+    } catch (SQLException e) {
+        System.out.println("Error listar disponibles: " + e.getMessage());
     }
+
+    return lista;
+}
+    public boolean estaEnUso(int idVehiculo) {
+
+    String sql = """
+        SELECT COUNT(*)
+        FROM Asignaciones a
+        JOIN Solicitudes s ON a.id_solicitud = s.id_solicitud
+        WHERE a.id_vehiculo = ?
+        AND CAST(GETDATE() AS DATE) BETWEEN s.fecha_salida AND s.fecha_regreso
+    """;
+
+    try (Connection con = Conexion.getConexion();
+         PreparedStatement ps = con.prepareStatement(sql)) {
+
+        ps.setInt(1, idVehiculo);
+
+        ResultSet rs = ps.executeQuery();
+
+        if (rs.next()) {
+            return rs.getInt(1) > 0;
+        }
+
+    } catch (SQLException e) {
+        System.out.println("Error validar uso: " + e.getMessage());
+    }
+
+    return false;
+}
+  
 }

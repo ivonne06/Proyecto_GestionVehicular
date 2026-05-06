@@ -80,4 +80,6 @@ public class Usuario {
     public void setIdEmpleado(int idEmpleado) {
         this.idEmpleado = idEmpleado;
     }
+
+   
 }

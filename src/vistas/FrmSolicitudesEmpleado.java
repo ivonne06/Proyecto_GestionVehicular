@@ -378,42 +378,51 @@ public class FrmSolicitudesEmpleado extends javax.swing.JInternalFrame {
     }// </editor-fold>//GEN-END:initComponents
 
     private void btnGuardarActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnGuardarActionPerformed
-        try {
-            validarCampos();
+      try {
+        validarCampos();
 
-            int idConductor;
+        int idConductor;
 
-            if (dao.empleadoTieneLicencia(usuario.getIdEmpleado())) {
-                idConductor = usuario.getIdEmpleado();
-            } else {
+        if (dao.empleadoTieneLicencia(usuario.getIdEmpleado())) {
+            idConductor = usuario.getIdEmpleado();
+        } else {
 
-                if (lblIdConductor.getText().isEmpty()) {
-                    throw new Exception("Debe seleccionar un conductor");
-                }
-
-                idConductor = Integer.parseInt(lblIdConductor.getText());
+            if (lblIdConductor.getText().isEmpty()) {
+                throw new Exception("Debe seleccionar un conductor");
             }
 
-            s.setIdEmpleado(usuario.getIdEmpleado());
-            s.setIdConductor(idConductor);
-            s.setDestino(txtDestino.getText().trim());
-            s.setMotivoViaje(txtMotivo.getText().trim());
-            s.setPasajeros(Integer.parseInt(txtPasajeros.getText()));
-
-            s.setFechaSalida(new java.sql.Date(dcSalida.getDate().getTime()));
-            s.setFechaRegreso(new java.sql.Date(dcRegreso.getDate().getTime()));
-
-            if (dao.insertar(s)) {
-                JOptionPane.showMessageDialog(this, "Solicitud creada correctamente");
-                cargarTabla();
-                limpiar();
-            } else {
-                JOptionPane.showMessageDialog(this, "Error al guardar");
-            }
-
-        } catch (Exception e) {
-            JOptionPane.showMessageDialog(this, e.getMessage());
+            idConductor = Integer.parseInt(lblIdConductor.getText());
         }
+
+
+        java.sql.Date salida = new java.sql.Date(dcSalida.getDate().getTime());
+        java.sql.Date regreso = new java.sql.Date(dcRegreso.getDate().getTime());
+
+  
+        if (!dao.conductorDisponible(idConductor, salida, regreso, 0)) {
+            throw new Exception("El conductor no está disponible en esas fechas");
+        }
+
+        s.setIdEmpleado(usuario.getIdEmpleado());
+        s.setIdConductor(idConductor);
+        s.setDestino(txtDestino.getText().trim());
+        s.setMotivoViaje(txtMotivo.getText().trim());
+        s.setPasajeros(Integer.parseInt(txtPasajeros.getText()));
+
+        s.setFechaSalida(salida);
+        s.setFechaRegreso(regreso);
+
+        if (dao.insertar(s)) {
+            JOptionPane.showMessageDialog(this, "Solicitud creada correctamente");
+            cargarTabla();
+            limpiar();
+        } else {
+            JOptionPane.showMessageDialog(this, "Error al guardar");
+        }
+
+    } catch (Exception e) {
+        JOptionPane.showMessageDialog(this, e.getMessage());
+    }
     }//GEN-LAST:event_btnGuardarActionPerformed
 
     private int obtenerIdSeleccionado() {
@@ -460,47 +469,55 @@ public class FrmSolicitudesEmpleado extends javax.swing.JInternalFrame {
     }//GEN-LAST:event_btnCancelarActionPerformed
 
     private void btnActualizarActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnActualizarActionPerformed
-        int id = obtenerIdSeleccionado();
-        if (id == -1) return;
+       int id = obtenerIdSeleccionado();
+    if (id == -1) return;
 
-        try {
-            validarCampos();
+    try {
+        validarCampos();
 
-            s.setId(id);
-            s.setIdEmpleado(usuario.getIdEmpleado());
-            s.setDestino(txtDestino.getText().trim());
-            s.setMotivoViaje(txtMotivo.getText().trim());
-            s.setPasajeros(Integer.parseInt(txtPasajeros.getText()));
+        int idConductor;
 
-            s.setFechaSalida(new java.sql.Date(dcSalida.getDate().getTime()));
-            s.setFechaRegreso(new java.sql.Date(dcRegreso.getDate().getTime()));
-            
-            int idConductor;
-
-            if (dao.empleadoTieneLicencia(usuario.getIdEmpleado())) {
-                idConductor = usuario.getIdEmpleado();
-            } else {
-                if (lblIdConductor.getText().isEmpty()) {
-                    throw new Exception("Debe seleccionar un conductor");
-                }
-                idConductor = Integer.parseInt(lblIdConductor.getText());
+        if (dao.empleadoTieneLicencia(usuario.getIdEmpleado())) {
+            idConductor = usuario.getIdEmpleado();
+        } else {
+            if (lblIdConductor.getText().isEmpty()) {
+                throw new Exception("Debe seleccionar un conductor");
             }
-
-            s.setIdConductor(idConductor);
-
-            if (dao.actualizar(s)) {
-                JOptionPane.showMessageDialog(this, "Solicitud actualizada");
-                cargarTabla();
-                limpiar();
-            } else {
-                JOptionPane.showMessageDialog(this, "No se pudo actualizar");
-            }
-
-        } catch (Exception e) {
-            JOptionPane.showMessageDialog(this, e.getMessage());
+            idConductor = Integer.parseInt(lblIdConductor.getText());
         }
-        
-        limpiar();
+
+       
+        java.sql.Date salida = new java.sql.Date(dcSalida.getDate().getTime());
+        java.sql.Date regreso = new java.sql.Date(dcRegreso.getDate().getTime());
+
+
+        if (!dao.conductorDisponible(idConductor, salida, regreso, id)) {
+            throw new Exception("El conductor no está disponible en esas fechas");
+        }
+
+        s.setId(id);
+        s.setIdEmpleado(usuario.getIdEmpleado());
+        s.setIdConductor(idConductor);
+        s.setDestino(txtDestino.getText().trim());
+        s.setMotivoViaje(txtMotivo.getText().trim());
+        s.setPasajeros(Integer.parseInt(txtPasajeros.getText()));
+
+        s.setFechaSalida(salida);
+        s.setFechaRegreso(regreso);
+
+        if (dao.actualizar(s)) {
+            JOptionPane.showMessageDialog(this, "Solicitud actualizada");
+            cargarTabla();
+            limpiar();
+        } else {
+            JOptionPane.showMessageDialog(this, "No se pudo actualizar");
+        }
+
+    } catch (Exception e) {
+        JOptionPane.showMessageDialog(this, e.getMessage());
+    }
+
+    limpiar();
     }//GEN-LAST:event_btnActualizarActionPerformed
 
     private void tblSolicitudesMouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_tblSolicitudesMouseClicked
