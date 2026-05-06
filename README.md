@@ -36,7 +36,7 @@ El **Sistema de Gestión Vehicular y Solicitudes de Viaje** centraliza la inform
 - 🔐 Implementar validaciones automáticas mediante triggers
 - 📊 Proporcionar reportes en tiempo real del estado de solicitudes
 - 👤 Controlar acceso basado en roles de empleados
-- ✅ Garantizar que solo personal operativo con licencia vigente solicite viajes
+- ✅ Garantizar que solo personal con licencia vigente pueda conducir
 
 ---
 
@@ -45,12 +45,12 @@ El **Sistema de Gestión Vehicular y Solicitudes de Viaje** centraliza la inform
 | Característica | Descripción |
 |---|---|
 | **Mantenimiento de Catálogos** | Gestión completa de empleados y vehículos con datos actualizados |
-| **Gestión de Viajes** | Formulario dinámico para registrar destinos, motivos de viaje y número de pasajeros |
-| **Validación de Roles** | Control de acceso y permisos basado en el tipo de empleado |
-| **Reporte de Solicitudes** | Visualización en tiempo real del estado (PENDIENTE, APROBADO, RECHAZADO) |
+| **Gestión de Solicitudes de Viaje** | Sistema completo de solicitud, aprobación y asignación de vehículos |
+| **Validación de Roles** | Control de acceso y permisos basado en el tipo de usuario |
+| **Asignación de Vehículos** | Asignación automática con validaciones de disponibilidad y fechas |
 | **Validaciones Automáticas** | Triggers en BD para garantizar integridad de datos |
 | **Historial de Viajes** | Consulta completa del historial de solicitudes procesadas |
-| **Restricciones de Seguridad** | Admins y gerentes no pueden solicitar viajes directamente |
+| **Validación de Licencias** | Solo empleados con licencia vigente pueden ser conductores |
 
 ---
 
@@ -127,15 +127,6 @@ El proyecto ya incluye las siguientes librerías. Si necesitas agregarlas manual
    - `sqljdbc.jar` (JDBC Driver 13.4.0.jre11)
    - `jcalendar-1.4.jar` (JCalendar 1.4)
 
-**Ubicación esperada de librerías:**
-```
-Proyecto_GestionVehicular/
-├── lib/
-│   ├── sqljdbc.jar (JDBC 13.4.0.jre11)
-│   └── jcalendar-1.4.jar
-└── src/
-```
-
 ---
 
 ## 🗄️ Configuración de la Base de Datos
@@ -161,13 +152,16 @@ SELECT TABLE_NAME FROM INFORMATION_SCHEMA.TABLES WHERE TABLE_TYPE = 'BASE TABLE'
 ```
 
 Debes ver las tablas:
+- `Usuarios`
 - `Empleados`
 - `Vehículos`
 - `Solicitudes`
+- `Asignaciones`
+- `UsoVehiculo`
 
 ### 3️⃣ Configurar la Conexión en el Proyecto
 
-Edita la clase de conexión (generalmente en `src/models/Conexion.java`):
+Edita la clase de conexión ubicada en `src/conexion/Conexion.java`:
 
 ```java
 public class Conexion {
@@ -218,57 +212,61 @@ public class Conexion {
 
 | Rol | Usuario | Contraseña | Acciones |
 |---|---|---|---|
-| **Administrador** | admin | admin123 | Gestionar empleados, vehículos, aprobar/rechazar viajes |
-| **Gerente** | gerente01 | gerente123 | Aprobar/rechazar viajes, ver reportes |
-| **Operario** | operario01 | operario123 | Solicitar viajes, ver estado de solicitudes |
+| **Admin** | ivonne.delgado | 1234 | Gestionar empleados, vehículos, EXCEPTO solicitar viajes |
+| **Encargado** | himer.gonzalez | 1234 | Aprobar/Rechazar solicitudes, asignar vehículos |
+| **Empleado** | carlos.gomez | 1234 | Solicitar viajes, ver estado de solicitudes |
 
 ### Flujo de Uso
 
-#### 👤 Para Operarios (Personal Operativo)
+#### 👤 Para Empleados
 
 1. **Iniciar sesión** con tus credenciales
 2. **Solicitar un viaje:**
    - Click en `Nueva Solicitud`
    - Completa los campos:
-     - **Destino:** Lugar a donde viajarás (txtDestino)
-     - **Motivo:** Razón del viaje (trabajo, reunión, etc.)
+     - **Destino:** Lugar a donde viajarás
+     - **Motivo:** Razón del viaje
      - **Número de Pasajeros:** Cantidad de personas
-     - **Fecha y Hora:** Cuándo necesitas el vehículo
+     - **Fecha de Salida:** Cuándo partes
+     - **Fecha de Regreso:** Cuándo regresas
    - Click en `Enviar Solicitud`
 
 3. **Ver estado:**
-   - Accede a `Mis Solicitudes` para ver el estado actual (PENDIENTE, APROBADO, RECHAZADO)
+   - Accede a `Mis Solicitudes` para ver el estado (PENDIENTE, APROBADA, ASIGNADA, FINALIZADA)
 
-#### 👔 Para Gerentes
+#### 👔 Para Encargados
 
-1. **Iniciar sesión** con credenciales de gerente
+1. **Iniciar sesión** con credenciales de encargado
 2. **Revisar solicitudes pendientes:**
-   - Accede a `Solicitudes Pendientes` (tblSolicitudes)
-   - Visualiza detalles: empleado, destino, motivo, fecha
+   - Accede a `Solicitudes Pendientes`
+   - Visualiza detalles: empleado, destino, motivo, fechas
 
 3. **Aprobar o Rechazar:**
    - Selecciona una solicitud
-   - Click en `Aprobar` para asignar un vehículo y conductor
-   - O click en `Rechazar` con observaciones (opcional)
+   - Click en `Aprobar` para aceptarla
+   - O click en `Rechazar` con motivo
 
-4. **Ver reportes:**
-   - Accede a `Reportes` para análisis de viajes, conductores más utilizados, etc.
+4. **Asignar Vehículo:**
+   - Si está aprobada, asigna un vehículo disponible
+   - El sistema valida disponibilidad por fechas
 
 #### 🔐 Para Administradores
 
 1. **Gestionar empleados:**
    - Agregar nuevos empleados
-   - Actualizar datos (nombre, cédula, licencia)
+   - Actualizar datos (nombre, DUI, licencia)
    - Desactivar empleados
 
 2. **Gestionar vehículos:**
    - Registrar nuevos vehículos
-   - Actualizar estado (disponible, en mantenimiento)
+   - Actualizar estado (disponible, en mantenimiento, inhabilitado)
    - Ver historial de uso
 
 3. **Procesar solicitudes:**
-   - Las mismas funciones que gerentes
+   - Acceso a todas las funciones de encargado
    - Acceso completo a toda la información
+
+**⚠️ NOTA:** Los administradores NO pueden solicitar viajes directamente
 
 ---
 
@@ -276,81 +274,124 @@ public class Conexion {
 
 ### Tablas Principales
 
-#### 📋 Tabla: Empleados
+#### 👥 Tabla: Usuarios
+```sql
+CREATE TABLE Usuarios (
+    id_usuario INT IDENTITY(1,1) PRIMARY KEY,
+    username VARCHAR(50) UNIQUE NOT NULL,
+    password VARCHAR(100) NOT NULL,
+    rol VARCHAR(20) DEFAULT 'EMPLEADO', -- ADMIN, ENCARGADO, EMPLEADO
+    estado BIT DEFAULT 0,
+    debe_cambiar_password BIT DEFAULT 1
+);
+```
+
+#### 👤 Tabla: Empleados
 ```sql
 CREATE TABLE Empleados (
-    EmpleadoID INT PRIMARY KEY IDENTITY(1,1),
-    Nombre NVARCHAR(100) NOT NULL,
-    Cedula NVARCHAR(20) UNIQUE NOT NULL,
-    Telefono NVARCHAR(15),
-    Email NVARCHAR(100),
-    Rol NVARCHAR(50) NOT NULL, -- Admin, Gerente, Operario
-    LicenciaVigente BIT NOT NULL DEFAULT 1,
-    FechaContratacion DATE,
-    Estado BIT NOT NULL DEFAULT 1
+    id_empleado INT IDENTITY(1,1) PRIMARY KEY,
+    nombres VARCHAR(100) NOT NULL,
+    apellidos VARCHAR(100) NOT NULL,
+    dui VARCHAR(10) UNIQUE NOT NULL,
+    telefono VARCHAR(20),
+    cargo VARCHAR(50),
+    departamento VARCHAR(50),
+    fecha_registro DATETIME DEFAULT GETDATE(),
+    licencia VARCHAR(20) DEFAULT 'SIN LICENCIA',
+    id_usuario INT UNIQUE FOREIGN KEY REFERENCES Usuarios(id_usuario)
 );
 ```
 
 #### 🚗 Tabla: Vehículos
 ```sql
-CREATE TABLE Vehículos (
-    VehiculoID INT PRIMARY KEY IDENTITY(1,1),
-    Placa NVARCHAR(20) UNIQUE NOT NULL,
-    Modelo NVARCHAR(100) NOT NULL,
-    Año INT NOT NULL,
-    Capacidad INT NOT NULL, -- Número de pasajeros
-    Estado NVARCHAR(50) NOT NULL, -- Disponible, En Mantenimiento, En Uso
-    FechaMantenimiento DATE,
-    Combustible INT, -- Galones
-    Kilometraje INT
+CREATE TABLE Vehiculos (
+    id_vehiculo INT IDENTITY(1,1) PRIMARY KEY,
+    marca VARCHAR(50),
+    modelo VARCHAR(50),
+    placa VARCHAR(20) UNIQUE NOT NULL,
+    pasajeros INT,
+    tipo VARCHAR(50),
+    estado VARCHAR(20) DEFAULT 'DISPONIBLE' 
+    -- Estados: DISPONIBLE, ASIGNADO, MANTENIMIENTO, INHABILITADO
 );
 ```
 
 #### ✈️ Tabla: Solicitudes
 ```sql
 CREATE TABLE Solicitudes (
-    SolicitudID INT PRIMARY KEY IDENTITY(1,1),
-    EmpleadoID INT NOT NULL,
-    VehiculoID INT,
-    ConductorID INT,
-    Destino NVARCHAR(200) NOT NULL,
-    Motivo NVARCHAR(500),
-    NumPasajeros INT NOT NULL,
-    FechaSolicitud DATETIME NOT NULL DEFAULT GETDATE(),
-    FechaViaje DATE NOT NULL,
-    HoraViaje TIME,
-    Estado NVARCHAR(50) NOT NULL, -- PENDIENTE, APROBADO, RECHAZADO
-    Observaciones NVARCHAR(500),
-    FOREIGN KEY (EmpleadoID) REFERENCES Empleados(EmpleadoID),
-    FOREIGN KEY (VehiculoID) REFERENCES Vehículos(VehiculoID),
-    FOREIGN KEY (ConductorID) REFERENCES Empleados(EmpleadoID)
+    id_solicitud INT IDENTITY(1,1) PRIMARY KEY,
+    id_empleado INT NOT NULL FOREIGN KEY REFERENCES Empleados(id_empleado),
+    id_conductor INT FOREIGN KEY REFERENCES Empleados(id_empleado),
+    id_usuario_aprobador INT FOREIGN KEY REFERENCES Usuarios(id_usuario),
+    fecha_salida DATE NOT NULL,
+    fecha_regreso DATE NOT NULL,
+    destino VARCHAR(150),
+    motivo_viaje VARCHAR(200),
+    motivo_respuesta VARCHAR(200),
+    pasajeros INT,
+    estado VARCHAR(20) DEFAULT 'PENDIENTE'
+    -- Estados: PENDIENTE, APROBADA, ASIGNADA, RECHAZADA, FINALIZADA, CANCELADA
+);
+```
+
+#### 🎯 Tabla: Asignaciones
+```sql
+CREATE TABLE Asignaciones (
+    id_asignacion INT IDENTITY(1,1) PRIMARY KEY,
+    id_solicitud INT UNIQUE NOT NULL FOREIGN KEY REFERENCES Solicitudes(id_solicitud),
+    id_vehiculo INT NOT NULL FOREIGN KEY REFERENCES Vehiculos(id_vehiculo),
+    id_usuario_asigno INT NOT NULL FOREIGN KEY REFERENCES Usuarios(id_usuario),
+    fecha_asignacion DATETIME DEFAULT GETDATE()
+);
+```
+
+#### 🔄 Tabla: UsoVehiculo
+```sql
+CREATE TABLE UsoVehiculo (
+    id_uso INT IDENTITY(1,1) PRIMARY KEY,
+    id_asignacion INT UNIQUE NOT NULL FOREIGN KEY REFERENCES Asignaciones(id_asignacion),
+    kilometraje_salida DECIMAL(10,2),
+    kilometraje_regreso DECIMAL(10,2),
+    observaciones VARCHAR(200),
+    fecha_devolucion DATETIME
 );
 ```
 
 ### Validaciones Automáticas (Triggers)
 
 El sistema incluye triggers para:
-- ✅ Validar que solo operarios con licencia vigente soliciten viajes
-- ✅ Evitar que admins y gerentes soliciten viajes directamente
-- ✅ Verificar que el vehículo tenga capacidad suficiente
-- ✅ Actualizar automáticamente el estado del vehículo
+- ✅ Crear usuario automáticamente cuando se registra un empleado
+- ✅ Actualizar estado de solicitud a ASIGNADA cuando se asigna un vehículo
+- ✅ Marcar vehículo como DISPONIBLE al devolverlo
+- ✅ Marcar solicitud como FINALIZADA al devolver el vehículo
+- ✅ Validar disponibilidad de vehículos por rango de fechas
+- ✅ Verificar capacidad del vehículo vs. número de pasajeros
+
+### Procedimientos Almacenados
+
+El sistema incluye procedimientos para:
+- **sp_asignar_vehiculo:** Valida y asigna un vehículo a una solicitud
+- **sp_vehiculos_disponibles_v2:** Lista vehículos disponibles en un rango de fechas
 
 ---
 
 ## 👥 Roles y Permisos
 
-| Permiso | Administrador | Gerente | Operario |
+| Permiso | Admin | Encargado | Empleado |
 |---|:---:|:---:|:---:|
 | Ver empleados | ✅ | ❌ | ❌ |
 | Crear empleado | ✅ | ❌ | ❌ |
 | Editar empleado | ✅ | ❌ | ❌ |
 | Ver vehículos | ✅ | ✅ | ❌ |
 | Crear vehículo | ✅ | ❌ | ❌ |
-| Solicitar viaje | ❌ | ❌ | ✅ |
+| **Solicitar viaje** | **❌** | ❌ | ✅ |
 | Aprobar solicitud | ✅ | ✅ | ❌ |
 | Rechazar solicitud | ✅ | ✅ | ❌ |
+| Asignar vehículo | ✅ | ✅ | ❌ |
 | Ver reportes | ✅ | ✅ | ❌ |
 | Ver mi historial | ✅ | ✅ | ✅ |
+
+**⚠️ IMPORTANTE:** Los Administradores NO pueden solicitar viajes, solo gestionar y aprobar
 
 ---
 
@@ -389,7 +430,7 @@ com.microsoft.sqlserver.jdbc.SQLServerException: Login failed for user 'sa'
 2. **Comprueba que SQL Server está corriendo:**
    - Windows: Services (services.msc) → SQL Server debe estar "Running"
 
-3. **Verifica las credenciales en `Conexion.java`:**
+3. **Verifica las credenciales en `src/conexion/Conexion.java`:**
    - Usuario correcto
    - Contraseña correcta
    - Nombre del servidor correcto
@@ -532,10 +573,11 @@ Este proyecto está bajo la licencia **MIT**. Ver archivo `LICENSE` para más de
 
 ### v1.0.0 (2026-05-06)
 - ✅ Funcionalidad base de gestión vehicular
-- ✅ Sistema de solicitudes de viaje
-- ✅ Validación de roles y permisos
-- ✅ Reportes en tiempo real
-- ✅ Triggers automáticos en BD
+- ✅ Sistema de solicitudes de viaje con validaciones
+- ✅ Validación de roles y permisos (ADMIN, ENCARGADO, EMPLEADO)
+- ✅ Asignación de vehículos con validación de fechas y capacidad
+- ✅ Triggers automáticos para manejo de estados
+- ✅ Procedimientos almacenados para operaciones críticas
 
 ---
 
