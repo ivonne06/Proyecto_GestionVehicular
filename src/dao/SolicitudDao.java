@@ -179,6 +179,7 @@ public class SolicitudDao {
         return false;
     }
     
+    //para buscar el conductor en txtBuscar
     public Object[] buscarConductor(String filtro) {
 
         String sql = "SELECT id_empleado, nombres, apellidos FROM Empleados " +
@@ -238,6 +239,41 @@ public class SolicitudDao {
 
         return lista;
     }
+    
+        public boolean conductorDisponible(int idConductor, Date salida, Date regreso, int idSolicitudActual) {
+
+        String sql = """
+            SELECT COUNT(*)
+            FROM Solicitudes
+            WHERE id_conductor = ?
+            AND estado IN ('APROBADA', 'ASIGNADA')
+            AND id_solicitud <> ?
+            AND NOT (
+                fecha_regreso < ?
+                OR fecha_salida > ?
+            )
+        """;
+
+        try (Connection con = Conexion.getConexion();
+             PreparedStatement ps = con.prepareStatement(sql)) {
+
+            ps.setInt(1, idConductor);
+            ps.setInt(2, idSolicitudActual); // para edición
+            ps.setDate(3, new java.sql.Date(salida.getTime()));
+            ps.setDate(4, new java.sql.Date(regreso.getTime()));
+
+            ResultSet rs = ps.executeQuery();
+
+            if (rs.next()) {
+                return rs.getInt(1) == 0; // TRUE = disponible
+            }
+
+        } catch (SQLException e) {
+            System.out.println("Error validar conductor: " + e.getMessage());
+        }
+
+        return false;
+    }
 
     //==============================
     //= ROL ENCARGADO              =
@@ -288,7 +324,8 @@ public class SolicitudDao {
     
     private boolean cambiarEstado(int id, String estado, String motivo) {
 
-        String sql = "UPDATE Solicitudes SET estado=?, motivo_respuesta=?, fecha_estado=GETDATE() WHERE id_solicitud=?";
+        String sql = "UPDATE Solicitudes SET estado=?, motivo_respuesta=?, fecha_estado=GETDATE() "
+                +"WHERE id_solicitud=?";
 
         try (Connection con = Conexion.getConexion();
              PreparedStatement ps = con.prepareStatement(sql)) {
@@ -313,59 +350,23 @@ public class SolicitudDao {
         return cambiarEstado(id, "RECHAZADA", motivo);
     }
     
-    public boolean cancelarPorEncargado(int idSolicitud, String motivo) {
+    public boolean cancelarAdmin(int idSolicitud, String motivo) {
 
-    String sql = "UPDATE Solicitudes " +
-                 "SET estado = 'CANCELADA', motivo_respuesta = ?, fecha_estado = GETDATE() " +
-                 "WHERE id_solicitud = ? AND estado = 'APROBADA'";
+        String sql = "UPDATE Solicitudes " +
+                     "SET estado = 'CANCELADA', motivo_respuesta = ?, fecha_estado = GETDATE() " +
+                     "WHERE id_solicitud = ? AND estado = 'APROBADA'";
 
-    try (Connection con = Conexion.getConexion();
-         PreparedStatement ps = con.prepareStatement(sql)) {
+        try (Connection con = Conexion.getConexion();
+             PreparedStatement ps = con.prepareStatement(sql)) {
 
-        ps.setString(1, motivo);
-        ps.setInt(2, idSolicitud);
+            ps.setString(1, motivo);
+            ps.setInt(2, idSolicitud);
 
-        return ps.executeUpdate() > 0;
+            return ps.executeUpdate() > 0;
 
-    } catch (SQLException e) {
-        System.out.println("Error cancelar por encargado: " + e.getMessage());
-        return false;
-    }
-}
-    
-    public boolean conductorDisponible(int idConductor, Date salida, Date regreso, int idSolicitudActual) {
-
-    String sql = """
-        SELECT COUNT(*)
-        FROM Solicitudes
-        WHERE id_conductor = ?
-        AND estado IN ('APROBADA', 'ASIGNADA')
-        AND id_solicitud <> ?
-        AND NOT (
-            fecha_regreso < ?
-            OR fecha_salida > ?
-        )
-    """;
-
-    try (Connection con = Conexion.getConexion();
-         PreparedStatement ps = con.prepareStatement(sql)) {
-
-        ps.setInt(1, idConductor);
-        ps.setInt(2, idSolicitudActual); // para edición
-        ps.setDate(3, new java.sql.Date(salida.getTime()));
-        ps.setDate(4, new java.sql.Date(regreso.getTime()));
-
-        ResultSet rs = ps.executeQuery();
-
-        if (rs.next()) {
-            return rs.getInt(1) == 0; // TRUE = disponible
+        } catch (SQLException e) {
+            System.out.println("Error cancelar por encargado: " + e.getMessage());
+            return false;
         }
-
-    } catch (SQLException e) {
-        System.out.println("Error validar conductor: " + e.getMessage());
     }
-
-    return false;
-}
-   
 }

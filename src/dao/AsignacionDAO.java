@@ -5,7 +5,7 @@ import java.sql.*;
 
 public class AsignacionDAO {
 
-    public boolean asignarVehiculo(int idSolicitud, int idVehiculo, int idUsuario) {
+    public String asignarVehiculo(int idSolicitud, int idVehiculo, int idUsuario) {
 
         String sql = "{CALL dbo.sp_asignar_vehiculo(?, ?, ?)}";
 
@@ -18,13 +18,13 @@ public class AsignacionDAO {
 
             cs.execute();
 
-            return true;
+             return "OK";
 
         } catch (SQLException e) {
 
             System.out.println("Error asignación: " + e.getMessage());
 
-            return false;
+            return e.getMessage();
         }
     }
 }

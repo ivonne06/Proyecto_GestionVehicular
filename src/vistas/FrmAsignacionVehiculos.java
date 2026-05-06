@@ -20,84 +20,80 @@ public class FrmAsignacionVehiculos extends javax.swing.JInternalFrame {
      * Creates new form FrmAsignacionVehiculos
      */
     public FrmAsignacionVehiculos(Usuario usr) {
-    initComponents();
-    this.usuarioLogueado = usr;
+        initComponents();
+        this.usuarioLogueado = usr;
 
-    cargarSolicitudes();
-}
-    
-        private void cargarSolicitudes() {
-
-    SolicitudDao dao = new SolicitudDao();
-    List<Object[]> lista = dao.listarTodas();
-
-    DefaultTableModel modelo = (DefaultTableModel) tblSolicitudes.getModel();
-    modelo.setRowCount(0);
-
-    for (Object[] fila : lista) {
-
-        String estado = fila[7].toString();
-
- 
-        if (estado.equals("APROBADA")) {
-
-            modelo.addRow(new Object[]{
-                fila[0], // id
-                fila[1], // empleado
-                fila[2], // destino
-                fila[4], // pasajeros
-                fila[5], // salida
-                fila[6], // regreso
-                fila[7]  // estado
-            });
-        }
+        cargarSolicitudes();
     }
-}
-    
-private void cargarVehiculosDisponibles() {
 
-    int fila = tblSolicitudes.getSelectedRow();
+    private void cargarSolicitudes() {
 
-    if (fila == -1) return;
-    
-    System.out.println("Pasajeros: " + tblSolicitudes.getValueAt(fila, 3));
-    System.out.println("Salida: " + tblSolicitudes.getValueAt(fila, 4));
-    System.out.println("Regreso: " + tblSolicitudes.getValueAt(fila, 5));
+        SolicitudDao dao = new SolicitudDao();
+        List<Object[]> lista = dao.listarTodas();
 
-    try {
-
-        int pasajeros = Integer.parseInt(tblSolicitudes.getValueAt(fila, 3).toString());
-
-        java.sql.Date salida = java.sql.Date.valueOf(tblSolicitudes.getValueAt(fila, 4).toString());
-        java.sql.Date regreso = java.sql.Date.valueOf(tblSolicitudes.getValueAt(fila, 5).toString());
-
-        VehiculoDAO dao = new VehiculoDAO();
-    List<Vehiculo> lista = dao.listar(); 
-
-        DefaultTableModel modelo = (DefaultTableModel) tblVehiculos.getModel();
+        DefaultTableModel modelo = (DefaultTableModel) tblSolicitudes.getModel();
         modelo.setRowCount(0);
 
-        if (lista.isEmpty()) {
-            JOptionPane.showMessageDialog(this, "No hay vehículos disponibles");
-            return;
-        }
+        for (Object[] fila : lista) {
 
-        for (Vehiculo v : lista) {
-            modelo.addRow(new Object[]{
-                v.getId(),
-                v.getMarca(),
-                v.getModelo(),
-                v.getPlaca(),
-                v.getPasajeros(),
-                v.getTipo()
-            });
-        }
+            String estado = fila[7].toString();
 
-    } catch (Exception e) {
-        JOptionPane.showMessageDialog(this, "Error: " + e.getMessage());
-        e.printStackTrace(); // 👈 IMPORTANTE para ver el error real
+
+            if (estado.equals("APROBADA")) {
+
+                modelo.addRow(new Object[]{
+                    fila[0], // id
+                    fila[1], // empleado
+                    fila[2], // destino
+                    fila[4], // pasajeros
+                    fila[5], // salida
+                    fila[6], // regreso
+                    fila[7]  // estado
+                });
+            }
+        }
     }
-}
+    
+    private void cargarVehiculosDisponibles() {
+
+        int fila = tblSolicitudes.getSelectedRow();
+
+        if (fila == -1) return;
+
+        try {
+
+            int pasajeros = Integer.parseInt(tblSolicitudes.getValueAt(fila, 3).toString());
+
+            java.sql.Date salida = java.sql.Date.valueOf(tblSolicitudes.getValueAt(fila, 4).toString());
+            java.sql.Date regreso = java.sql.Date.valueOf(tblSolicitudes.getValueAt(fila, 5).toString());
+
+            VehiculoDAO dao = new VehiculoDAO();
+        List<Vehiculo> lista = dao.listar(); 
+
+            DefaultTableModel modelo = (DefaultTableModel) tblVehiculos.getModel();
+            modelo.setRowCount(0);
+
+            if (lista.isEmpty()) {
+                JOptionPane.showMessageDialog(this, "No hay vehículos disponibles");
+                return;
+            }
+
+            for (Vehiculo v : lista) {
+                modelo.addRow(new Object[]{
+                    v.getId(),
+                    v.getMarca(),
+                    v.getModelo(),
+                    v.getPlaca(),
+                    v.getPasajeros(),
+                    v.getTipo()
+                });
+            }
+
+        } catch (Exception e) {
+            JOptionPane.showMessageDialog(this, "Error: " + e.getMessage());
+            e.printStackTrace();
+        }
+    }
 
     /**
      * This method is called from within the constructor to initialize the form.
@@ -189,7 +185,7 @@ private void cargarVehiculosDisponibles() {
     }// </editor-fold>//GEN-END:initComponents
 
     private void btnAsignarActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnAsignarActionPerformed
-  int filaSolicitud = tblSolicitudes.getSelectedRow();
+        int filaSolicitud = tblSolicitudes.getSelectedRow();
         int filaVehiculo = tblVehiculos.getSelectedRow();
 
         if (filaSolicitud == -1 || filaVehiculo == -1) {
@@ -206,16 +202,17 @@ private void cargarVehiculosDisponibles() {
 
             AsignacionDAO dao = new AsignacionDAO();
 
-            boolean ok = dao.asignarVehiculo(idSolicitud, idVehiculo, idUsuario);
+            String resultado = dao.asignarVehiculo(idSolicitud, idVehiculo, idUsuario);
 
-            if (ok) {
+            if (resultado.equals("OK")) {
+
                 JOptionPane.showMessageDialog(null, "Asignación realizada");
 
                 cargarSolicitudes();
                 ((DefaultTableModel) tblVehiculos.getModel()).setRowCount(0);
 
             } else {
-                JOptionPane.showMessageDialog(null, "Auto no disponible en ese rango de fecha");
+                JOptionPane.showMessageDialog(null, resultado);
             }
 
         } catch (Exception e) {
@@ -224,7 +221,7 @@ private void cargarVehiculosDisponibles() {
     }//GEN-LAST:event_btnAsignarActionPerformed
 
     private void tblSolicitudesMouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_tblSolicitudesMouseClicked
-     cargarVehiculosDisponibles();
+        cargarVehiculosDisponibles();
     }//GEN-LAST:event_tblSolicitudesMouseClicked
 
 
