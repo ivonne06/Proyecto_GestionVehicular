@@ -240,7 +240,7 @@ public class SolicitudDao {
         return lista;
     }
     
-        public boolean conductorDisponible(int idConductor, Date salida, Date regreso, int idSolicitudActual) {
+    public boolean conductorDisponible(int idConductor, Date salida, Date regreso, int idSolicitudActual) {
 
         String sql = """
             SELECT COUNT(*)
@@ -270,6 +270,43 @@ public class SolicitudDao {
 
         } catch (SQLException e) {
             System.out.println("Error validar conductor: " + e.getMessage());
+        }
+
+        return false;
+    }
+        
+    //validar que el empleado no tenga otra solicitud que choque en fechas 
+    public boolean empleadoDisponible(int idEmpleado, Date salida, Date regreso, int idSolicitudActual) {
+
+        String sql = """
+            SELECT COUNT(*)
+            FROM Solicitudes
+            WHERE id_empleado = ?
+            AND estado IN ('PENDIENTE', 'APROBADA', 'ASIGNADA')
+            AND id_solicitud <> ?
+            AND NOT (
+                fecha_regreso < ?
+                OR fecha_salida > ?
+            )
+        """;
+
+        try (Connection con = Conexion.getConexion();
+             PreparedStatement ps = con.prepareStatement(sql)) {
+
+            ps.setInt(1, idEmpleado);
+            ps.setInt(2, idSolicitudActual);
+
+            ps.setDate(3, new java.sql.Date(salida.getTime()));
+            ps.setDate(4, new java.sql.Date(regreso.getTime()));
+
+            ResultSet rs = ps.executeQuery();
+
+            if (rs.next()) {
+                return rs.getInt(1) == 0;
+            }
+
+        } catch (SQLException e) {
+            System.out.println("Error validar empleado: " + e.getMessage());
         }
 
         return false;

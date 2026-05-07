@@ -398,7 +398,9 @@ public class FrmSolicitudesEmpleado extends javax.swing.JInternalFrame {
         java.sql.Date salida = new java.sql.Date(dcSalida.getDate().getTime());
         java.sql.Date regreso = new java.sql.Date(dcRegreso.getDate().getTime());
 
-  
+        if (!dao.empleadoDisponible(usuario.getIdEmpleado(), salida, regreso, 0)) {
+            throw new Exception("Ya tiene una solicitud registrada en esas fechas");
+        }
         if (!dao.conductorDisponible(idConductor, salida, regreso, 0)) {
             throw new Exception("El conductor no está disponible en esas fechas");
         }
@@ -469,55 +471,57 @@ public class FrmSolicitudesEmpleado extends javax.swing.JInternalFrame {
     }//GEN-LAST:event_btnCancelarActionPerformed
 
     private void btnActualizarActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnActualizarActionPerformed
-       int id = obtenerIdSeleccionado();
-    if (id == -1) return;
+        int id = obtenerIdSeleccionado();
+        if (id == -1) return;
 
-    try {
-        validarCampos();
+        try {
+            validarCampos();
 
-        int idConductor;
+            int idConductor;
 
-        if (dao.empleadoTieneLicencia(usuario.getIdEmpleado())) {
-            idConductor = usuario.getIdEmpleado();
-        } else {
-            if (lblIdConductor.getText().isEmpty()) {
-                throw new Exception("Debe seleccionar un conductor");
+            if (dao.empleadoTieneLicencia(usuario.getIdEmpleado())) {
+                idConductor = usuario.getIdEmpleado();
+            } else {
+                if (lblIdConductor.getText().isEmpty()) {
+                    throw new Exception("Debe seleccionar un conductor");
+                }
+                idConductor = Integer.parseInt(lblIdConductor.getText());
             }
-            idConductor = Integer.parseInt(lblIdConductor.getText());
+
+
+            java.sql.Date salida = new java.sql.Date(dcSalida.getDate().getTime());
+            java.sql.Date regreso = new java.sql.Date(dcRegreso.getDate().getTime());
+
+            if (!dao.empleadoDisponible(usuario.getIdEmpleado(), salida, regreso, id)) {
+                throw new Exception("Ya tiene una solicitud registrada en esas fechas");
+            }
+            if (!dao.conductorDisponible(idConductor, salida, regreso, id)) {
+                throw new Exception("El conductor no está disponible en esas fechas");
+            }
+
+            s.setId(id);
+            s.setIdEmpleado(usuario.getIdEmpleado());
+            s.setIdConductor(idConductor);
+            s.setDestino(txtDestino.getText().trim());
+            s.setMotivoViaje(txtMotivo.getText().trim());
+            s.setPasajeros(Integer.parseInt(txtPasajeros.getText()));
+
+            s.setFechaSalida(salida);
+            s.setFechaRegreso(regreso);
+
+            if (dao.actualizar(s)) {
+                JOptionPane.showMessageDialog(this, "Solicitud actualizada");
+                cargarTabla();
+                limpiar();
+            } else {
+                JOptionPane.showMessageDialog(this, "No se pudo actualizar");
+            }
+
+        } catch (Exception e) {
+            JOptionPane.showMessageDialog(this, e.getMessage());
         }
 
-       
-        java.sql.Date salida = new java.sql.Date(dcSalida.getDate().getTime());
-        java.sql.Date regreso = new java.sql.Date(dcRegreso.getDate().getTime());
-
-
-        if (!dao.conductorDisponible(idConductor, salida, regreso, id)) {
-            throw new Exception("El conductor no está disponible en esas fechas");
-        }
-
-        s.setId(id);
-        s.setIdEmpleado(usuario.getIdEmpleado());
-        s.setIdConductor(idConductor);
-        s.setDestino(txtDestino.getText().trim());
-        s.setMotivoViaje(txtMotivo.getText().trim());
-        s.setPasajeros(Integer.parseInt(txtPasajeros.getText()));
-
-        s.setFechaSalida(salida);
-        s.setFechaRegreso(regreso);
-
-        if (dao.actualizar(s)) {
-            JOptionPane.showMessageDialog(this, "Solicitud actualizada");
-            cargarTabla();
-            limpiar();
-        } else {
-            JOptionPane.showMessageDialog(this, "No se pudo actualizar");
-        }
-
-    } catch (Exception e) {
-        JOptionPane.showMessageDialog(this, e.getMessage());
-    }
-
-    limpiar();
+        limpiar();
     }//GEN-LAST:event_btnActualizarActionPerformed
 
     private void tblSolicitudesMouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_tblSolicitudesMouseClicked
