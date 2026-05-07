@@ -516,20 +516,25 @@ VALUES ('Himer Alexis', 'Gonzalez Pineda', '13456782-5', '7000-0005', 'Superviso
 INSERT INTO Empleados (nombres, apellidos, dui, telefono, cargo, departamento)
 VALUES ('Carlos Roberto', 'Gomez Rivas', '55555555-5', '7000-0006', 'Asistente', 'Ventas');
 
--- 2. ACTIVAR USUARIOS Y ASIGNAR ROLES
+-- 2. ACTIVAR TODOS LOS USUARIOS DE SEEDERS
+UPDATE Usuarios
+SET estado = 1,
+    debe_cambiar_password = 0;
+
+
+-- 3.ASIGNAR ROLES ESPECIALES
+
 -- Admin (Ivonne)
-UPDATE Usuarios SET rol = 'ADMIN', estado = 1, debe_cambiar_password = 0 
+UPDATE Usuarios
+SET rol = 'ADMIN'
 WHERE username LIKE 'ivonne.delgado%';
 
 -- Encargado (Himer)
-UPDATE Usuarios SET rol = 'ENCARGADO', estado = 1, debe_cambiar_password = 0 
+UPDATE Usuarios
+SET rol = 'ENCARGADO'
 WHERE username LIKE 'himer.gonzalez%';
 
--- Empleado Activo (Carlos) para probar login de usuario común
-UPDATE Usuarios SET rol = 'EMPLEADO', estado = 1, debe_cambiar_password = 0 
-WHERE username LIKE 'carlos.gomez%';
-
--- 3. INSERT DE VEHICULOS
+-- 4. INSERT DE VEHICULOS
 INSERT INTO Vehiculos (marca, modelo, placa, pasajeros, tipo, estado)
 VALUES
 ('Toyota', 'Hilux', 'P123-487', 5, 'Pickup', 'DISPONIBLE'),
@@ -538,7 +543,7 @@ VALUES
 ('Kia', 'Sportage', 'P456-789', 5, 'Camioneta', 'INHABILITADO'),
 ('Isuzu', 'D-Max', 'P567-890', 5, 'Pickup', 'MANTENIMIENTO');
 
--- 4. INSERT DE SOLICITUDES (Con Lógica de Licencias)
+-- 6. INSERT DE SOLICITUDES (Con Lógica de Licencias)
 -- Regla 1: Solo 'EMPLEADO' solicita. 
 -- Regla 2: Si el solicitante tiene licencia, se pone él mismo; si no, se asigna otro conductor.
 
@@ -565,5 +570,3 @@ VALUES
 
 GO
 SELECT 'Seeders cargados con éxito' as Mensaje;-- ======================================================
-
-select * from Solicitudes

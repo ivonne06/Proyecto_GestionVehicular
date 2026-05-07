@@ -179,12 +179,25 @@ public class SolicitudDao {
         return false;
     }
     
-    //para buscar el conductor en txtBuscar
+    //para buscar el conductor activo en txtBuscar
     public Object[] buscarConductor(String filtro) {
 
-        String sql = "SELECT id_empleado, nombres, apellidos FROM Empleados " +
-                     "WHERE (nombres LIKE ? OR dui LIKE ?) " +
-                     "AND licencia IS NOT NULL AND licencia <> 'SIN LICENCIA'";
+        String sql = """
+            SELECT 
+                e.id_empleado,
+                e.nombres,
+                e.apellidos
+            FROM Empleados e
+            INNER JOIN Usuarios u
+                ON e.id_usuario = u.id_usuario
+            WHERE (
+                e.nombres LIKE ?
+                OR e.dui LIKE ?
+            )
+            AND e.licencia IS NOT NULL
+            AND e.licencia <> 'SIN LICENCIA'
+            AND u.estado = 1
+        """;
 
         try (Connection con = Conexion.getConexion();
              PreparedStatement ps = con.prepareStatement(sql)) {
@@ -195,6 +208,7 @@ public class SolicitudDao {
             ResultSet rs = ps.executeQuery();
 
             if (rs.next()) {
+
                 return new Object[]{
                     rs.getInt("id_empleado"),
                     rs.getString("nombres") + " " + rs.getString("apellidos")
@@ -208,14 +222,27 @@ public class SolicitudDao {
         return null;
     }
     
+    //lista solo condutores(empleados) con usuario activo 
     public List<Object[]> listarConductores(String filtro) {
 
         List<Object[]> lista = new ArrayList<>();
 
-        String sql = "SELECT id_empleado, nombres + ' ' + apellidos AS nombre, dui " +
-                     "FROM Empleados " +
-                     "WHERE licencia IS NOT NULL AND licencia <> 'SIN LICENCIA' " +
-                     "AND (nombres LIKE ? OR dui LIKE ?)";
+        String sql = """
+            SELECT 
+                e.id_empleado,
+                e.nombres + ' ' + e.apellidos AS nombre,
+                e.dui
+            FROM Empleados e
+            INNER JOIN Usuarios u 
+                ON e.id_usuario = u.id_usuario
+            WHERE e.licencia IS NOT NULL
+            AND e.licencia <> 'SIN LICENCIA'
+            AND u.estado = 1
+            AND (
+                e.nombres LIKE ?
+                OR e.dui LIKE ?
+            )
+        """;
 
         try (Connection con = Conexion.getConexion();
              PreparedStatement ps = con.prepareStatement(sql)) {
@@ -226,6 +253,7 @@ public class SolicitudDao {
             ResultSet rs = ps.executeQuery();
 
             while (rs.next()) {
+
                 lista.add(new Object[]{
                     rs.getInt("id_empleado"),
                     rs.getString("nombre"),
