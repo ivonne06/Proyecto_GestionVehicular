@@ -6,6 +6,8 @@
 -- =========================
 -- CREACIÓN BD
 -- =========================
+DROP DATABASE IF EXISTS BD_GestionVehicular;
+GO
 
 CREATE DATABASE BD_GestionVehicular;
 GO
@@ -118,13 +120,21 @@ CREATE TABLE Solicitudes (
         CHECK (estado IN ('PENDIENTE', 'APROBADA', 'ASIGNADA', 'RECHAZADA', 'FINALIZADA', 'CANCELADA')),
 
     CONSTRAINT chk_solicitudes_motivo_respuesta 
-        CHECK (
-            (estado = 'PENDIENTE' AND motivo_respuesta IS NULL)
-            OR
-            (estado IN ('APROBADA', 'ASIGNADA', 'RECHAZADA', 'CANCELADA') 
-                AND motivo_respuesta IS NOT NULL 
-                AND LTRIM(RTRIM(motivo_respuesta)) <> '')
-        ),
+		CHECK (
+			(estado = 'PENDIENTE' AND motivo_respuesta IS NULL)
+			OR
+			(
+				estado IN (
+					'APROBADA',
+					'ASIGNADA',
+					'RECHAZADA',
+					'CANCELADA',
+					'FINALIZADA'
+				)
+				AND motivo_respuesta IS NOT NULL
+				AND LTRIM(RTRIM(motivo_respuesta)) <> ''
+			)
+		),
 
     -- PK
     CONSTRAINT pk_solicitudes PRIMARY KEY (id_solicitud),
@@ -169,27 +179,38 @@ CREATE TABLE Asignaciones (
 );
 
 -- =========================
--- USO / DEVOLUCION VEHICULO
+-- DEVOLUCION VEHICULO
 -- =========================
-CREATE TABLE UsoVehiculo (
-	id_uso INT IDENTITY(1,1),
+CREATE TABLE DevolucionVehiculo (
+    id_devolucion INT IDENTITY(1,1),
 
     id_asignacion INT NOT NULL,
-    kilometraje_salida DECIMAL(10,2),
-    kilometraje_regreso DECIMAL(10,2),
+
+    kilometraje_salida DECIMAL(10,2) NOT NULL,
+    kilometraje_regreso DECIMAL(10,2) NOT NULL,
+
     observaciones VARCHAR(200),
-    fecha_devolucion DATETIME,
+
+    fecha_devolucion DATETIME DEFAULT GETDATE(),
 
     -- PK
-    CONSTRAINT pk_uso_vehiculo PRIMARY KEY (id_uso),
+    CONSTRAINT pk_devolucion_vehiculo 
+        PRIMARY KEY (id_devolucion),
 
     -- UNIQUE
-    CONSTRAINT uq_uso_asignacion UNIQUE (id_asignacion),
+    CONSTRAINT uq_devolucion_asignacion 
+        UNIQUE (id_asignacion),
+
+    -- CHECK
+    CONSTRAINT chk_devolucion_kilometraje
+        CHECK (kilometraje_regreso > kilometraje_salida),
 
     -- FK
-    CONSTRAINT fk_uso_asignacion 
-        FOREIGN KEY (id_asignacion) REFERENCES Asignaciones(id_asignacion)
+    CONSTRAINT fk_devolucion_asignacion
+        FOREIGN KEY (id_asignacion)
+        REFERENCES Asignaciones(id_asignacion)
 );
+
 
 -- =========================
 -- TRIGGERS
@@ -313,29 +334,37 @@ GO
 DROP TRIGGER IF EXISTS trg_devolucion;
 GO
 
-GO
 CREATE TRIGGER trg_devolucion
-ON UsoVehiculo
+ON DevolucionVehiculo
 AFTER INSERT
 AS
 BEGIN
-    -- vehículo disponible
-    UPDATE Vehiculos
-    SET estado = 'DISPONIBLE'
-    WHERE id_vehiculo IN (
-        SELECT a.id_vehiculo
-        FROM Asignaciones a
-        JOIN inserted i ON a.id_asignacion = i.id_asignacion
-    );
+    SET NOCOUNT ON;
 
-    -- solicitud finalizada
-    UPDATE Solicitudes
-    SET estado = 'FINALIZADA'
-    WHERE id_solicitud IN (
-        SELECT a.id_solicitud
-        FROM Asignaciones a
-        JOIN inserted i ON a.id_asignacion = i.id_asignacion
-    );
+    -- =========================
+    -- VEHICULO DISPONIBLE
+    -- =========================
+    UPDATE v
+    SET v.estado = 'DISPONIBLE'
+    FROM Vehiculos v
+    INNER JOIN Asignaciones a
+        ON v.id_vehiculo = a.id_vehiculo
+    INNER JOIN inserted i
+        ON a.id_asignacion = i.id_asignacion;
+
+    -- =========================
+    -- SOLICITUD FINALIZADA
+    -- =========================
+    UPDATE s
+    SET 
+        s.estado = 'FINALIZADA',
+        s.fecha_estado = GETDATE()
+    FROM Solicitudes s
+    INNER JOIN Asignaciones a
+        ON s.id_solicitud = a.id_solicitud
+    INNER JOIN inserted i
+        ON a.id_asignacion = i.id_asignacion;
+
 END;
 GO
 
@@ -515,6 +544,7 @@ VALUES ('Himer Alexis', 'Gonzalez Pineda', '13456782-5', '7000-0005', 'Superviso
 
 INSERT INTO Empleados (nombres, apellidos, dui, telefono, cargo, departamento)
 VALUES ('Carlos Roberto', 'Gomez Rivas', '55555555-5', '7000-0006', 'Asistente', 'Ventas');
+
 
 -- 2. ACTIVAR TODOS LOS USUARIOS DE SEEDERS
 UPDATE Usuarios

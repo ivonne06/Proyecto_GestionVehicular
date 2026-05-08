@@ -94,6 +94,7 @@ public class FrmPrincipal extends javax.swing.JFrame {
             mItemVehiculos.setVisible(true);
             mItemSolicitudes.setVisible(true);
             mItemAsignaciones.setVisible(true);
+            mItemDevolucionVehiculo.setVisible(true);
             mItemReportes.setVisible(true);
         }
 
@@ -105,6 +106,7 @@ public class FrmPrincipal extends javax.swing.JFrame {
             mItemVehiculos.setVisible(true);
             mItemSolicitudes.setVisible(true);
             mItemAsignaciones.setVisible(true);
+            mItemDevolucionVehiculo.setVisible(true);
             mItemReportes.setVisible(false);
         }
 
@@ -114,8 +116,9 @@ public class FrmPrincipal extends javax.swing.JFrame {
             mItemEmpleados.setVisible(false);
             mItemVehiculos.setVisible(false);
             mItemAsignaciones.setVisible(false);
+            mItemDevolucionVehiculo.setVisible(false);
             mItemReportes.setVisible(false);
-
+            
             mItemSolicitudes.setVisible(true); 
         }
     }
@@ -133,12 +136,13 @@ public class FrmPrincipal extends javax.swing.JFrame {
         jMenuBar1 = new javax.swing.JMenuBar();
         menuUsuario = new javax.swing.JMenu();
         mItemSesion = new javax.swing.JMenuItem();
-        menuModulo = new javax.swing.JMenu();
+        men = new javax.swing.JMenu();
         mItemUsuarios = new javax.swing.JMenuItem();
         mItemEmpleados = new javax.swing.JMenuItem();
         mItemVehiculos = new javax.swing.JMenuItem();
         mItemSolicitudes = new javax.swing.JMenuItem();
         mItemAsignaciones = new javax.swing.JMenuItem();
+        mItemDevolucionVehiculo = new javax.swing.JMenuItem();
         mItemReportes = new javax.swing.JMenuItem();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
@@ -166,10 +170,10 @@ public class FrmPrincipal extends javax.swing.JFrame {
 
         jMenuBar1.add(menuUsuario);
 
-        menuModulo.setText("Modulos");
-        menuModulo.addActionListener(new java.awt.event.ActionListener() {
+        men.setText("Modulos");
+        men.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
-                menuModuloActionPerformed(evt);
+                menActionPerformed(evt);
             }
         });
 
@@ -179,7 +183,7 @@ public class FrmPrincipal extends javax.swing.JFrame {
                 mItemUsuariosActionPerformed(evt);
             }
         });
-        menuModulo.add(mItemUsuarios);
+        men.add(mItemUsuarios);
 
         mItemEmpleados.setText("Empleados");
         mItemEmpleados.addActionListener(new java.awt.event.ActionListener() {
@@ -187,7 +191,7 @@ public class FrmPrincipal extends javax.swing.JFrame {
                 mItemEmpleadosActionPerformed(evt);
             }
         });
-        menuModulo.add(mItemEmpleados);
+        men.add(mItemEmpleados);
 
         mItemVehiculos.setText("Vehiculos");
         mItemVehiculos.addActionListener(new java.awt.event.ActionListener() {
@@ -195,7 +199,7 @@ public class FrmPrincipal extends javax.swing.JFrame {
                 mItemVehiculosActionPerformed(evt);
             }
         });
-        menuModulo.add(mItemVehiculos);
+        men.add(mItemVehiculos);
 
         mItemSolicitudes.setText("Solicitudes");
         mItemSolicitudes.addActionListener(new java.awt.event.ActionListener() {
@@ -203,7 +207,7 @@ public class FrmPrincipal extends javax.swing.JFrame {
                 mItemSolicitudesActionPerformed(evt);
             }
         });
-        menuModulo.add(mItemSolicitudes);
+        men.add(mItemSolicitudes);
 
         mItemAsignaciones.setText("Asignaciones");
         mItemAsignaciones.addActionListener(new java.awt.event.ActionListener() {
@@ -211,12 +215,20 @@ public class FrmPrincipal extends javax.swing.JFrame {
                 mItemAsignacionesActionPerformed(evt);
             }
         });
-        menuModulo.add(mItemAsignaciones);
+        men.add(mItemAsignaciones);
+
+        mItemDevolucionVehiculo.setText("Devolucion de Vehiculo");
+        mItemDevolucionVehiculo.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                mItemDevolucionVehiculoActionPerformed(evt);
+            }
+        });
+        men.add(mItemDevolucionVehiculo);
 
         mItemReportes.setText("Reportes");
-        menuModulo.add(mItemReportes);
+        men.add(mItemReportes);
 
-        jMenuBar1.add(menuModulo);
+        jMenuBar1.add(men);
 
         setJMenuBar(jMenuBar1);
 
@@ -234,9 +246,9 @@ public class FrmPrincipal extends javax.swing.JFrame {
         pack();
     }// </editor-fold>//GEN-END:initComponents
 
-    private void menuModuloActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_menuModuloActionPerformed
+    private void menActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_menActionPerformed
         // TODO add your handling code here:
-    }//GEN-LAST:event_menuModuloActionPerformed
+    }//GEN-LAST:event_menActionPerformed
 
     private void mItemVehiculosActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_mItemVehiculosActionPerformed
         abrirFormulario(new FrmVehiculos());
@@ -264,7 +276,7 @@ public class FrmPrincipal extends javax.swing.JFrame {
     }//GEN-LAST:event_mItemSesionActionPerformed
 
     private void mItemAsignacionesActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_mItemAsignacionesActionPerformed
-    abrirFormulario(new FrmAsignacionVehiculos(userSesion));
+        abrirFormulario(new FrmAsignacionVehiculos(userSesion));
     }//GEN-LAST:event_mItemAsignacionesActionPerformed
 
     private void mItemUsuariosActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_mItemUsuariosActionPerformed
@@ -289,18 +301,23 @@ public class FrmPrincipal extends javax.swing.JFrame {
         }
     }//GEN-LAST:event_mItemSolicitudesActionPerformed
 
+    private void mItemDevolucionVehiculoActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_mItemDevolucionVehiculoActionPerformed
+        abrirFormulario(new FrmDevolucionVehiculo());
+    }//GEN-LAST:event_mItemDevolucionVehiculoActionPerformed
+
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JDesktopPane escritorio;
     private javax.swing.JMenuBar jMenuBar1;
     private javax.swing.JMenuItem mItemAsignaciones;
+    private javax.swing.JMenuItem mItemDevolucionVehiculo;
     private javax.swing.JMenuItem mItemEmpleados;
     private javax.swing.JMenuItem mItemReportes;
     private javax.swing.JMenuItem mItemSesion;
     private javax.swing.JMenuItem mItemSolicitudes;
     private javax.swing.JMenuItem mItemUsuarios;
     private javax.swing.JMenuItem mItemVehiculos;
-    private javax.swing.JMenu menuModulo;
+    private javax.swing.JMenu men;
     private javax.swing.JMenu menuUsuario;
     // End of variables declaration//GEN-END:variables
 }
