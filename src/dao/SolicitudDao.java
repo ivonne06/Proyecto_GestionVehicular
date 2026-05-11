@@ -15,12 +15,14 @@ public class SolicitudDao {
         List<Object[]> lista = new ArrayList<>();
 
         String sql = "SELECT s.id_solicitud, s.destino, s.motivo_viaje, s.motivo_respuesta, " +
-             "s.pasajeros, s.fecha_salida, s.fecha_regreso, s.estado, " +
-             "c.id_empleado AS id_conductor, " +
-             "c.nombres + ' ' + c.apellidos AS conductor " +
-             "FROM Solicitudes s " +
-             "LEFT JOIN Empleados c ON s.id_conductor = c.id_empleado " +
-             "WHERE s.id_empleado=?";
+            "s.pasajeros, s.fecha_salida, s.fecha_regreso, s.estado, " +
+            "c.id_empleado AS id_conductor, " +
+            "c.nombres + ' ' + c.apellidos AS conductor " +
+            "FROM Solicitudes s " +
+            "LEFT JOIN Empleados c ON s.id_conductor = c.id_empleado " +
+            "WHERE s.id_empleado=? " +
+            "AND s.estado IN ('PENDIENTE', 'APROBADA', 'ASIGNADA') " +
+            "ORDER BY s.fecha_salida DESC";
 
         try (Connection con = Conexion.getConexion();
              PreparedStatement ps = con.prepareStatement(sql)) {
@@ -344,15 +346,39 @@ public class SolicitudDao {
     //= ROL ENCARGADO              =
     //==============================
     
-    // LISTAR TODAS
+    // LISTAR TODAS en solicitud Admin con las que puede trabajar el horario
+    // dando prioridad a las mas cercanas en fechas
     public List<Object[]> listarTodas() {
 
         List<Object[]> lista = new ArrayList<>();
 
-        String sql = "SELECT s.id_solicitud, e.nombres + ' ' + e.apellidos AS empleado, " +
-                 "s.destino, s.motivo_viaje, s.motivo_respuesta, s.pasajeros, " +
-                 "s.fecha_salida, s.fecha_regreso, s.estado " +
-                 "FROM Solicitudes s INNER JOIN Empleados e ON s.id_empleado = e.id_empleado";
+        String sql = """
+            SELECT 
+                s.id_solicitud,
+                e.nombres + ' ' + e.apellidos AS empleado,
+                c.nombres + ' ' + c.apellidos AS conductor,
+                s.destino,
+                s.motivo_viaje,
+                s.motivo_respuesta,
+                s.pasajeros,
+                s.fecha_salida,
+                s.fecha_regreso,
+                s.estado
+            FROM Solicitudes s
+            INNER JOIN Empleados e
+                ON s.id_empleado = e.id_empleado
+            INNER JOIN Empleados c
+                ON s.id_conductor = c.id_empleado
+            WHERE s.estado IN ('PENDIENTE', 'APROBADA', 'ASIGNADA')
+            ORDER BY
+                CASE
+                    WHEN s.estado = 'PENDIENTE' THEN 1
+                    WHEN s.estado = 'APROBADA' THEN 2
+                    WHEN s.estado = 'ASIGNADA' THEN 3
+                END,
+                ABS(DATEDIFF(DAY, GETDATE(), s.fecha_salida)),
+                s.fecha_salida ASC
+        """;
 
         try (Connection con = Conexion.getConexion();
              PreparedStatement ps = con.prepareStatement(sql);
@@ -371,6 +397,7 @@ public class SolicitudDao {
                 lista.add(new Object[]{
                     rs.getInt("id_solicitud"),
                     rs.getString("empleado"),
+                    rs.getString("conductor"),
                     rs.getString("destino"),
                     motivo,
                     rs.getInt("pasajeros"),
@@ -386,7 +413,7 @@ public class SolicitudDao {
 
         return lista;
     }
-    
+
     private boolean cambiarEstado(int id, String estado, String motivo) {
 
         String sql = "UPDATE Solicitudes SET estado=?, motivo_respuesta=?, fecha_estado=GETDATE() "
@@ -433,5 +460,64 @@ public class SolicitudDao {
             System.out.println("Error cancelar por encargado: " + e.getMessage());
             return false;
         }
+    }
+    
+    public List<Object[]> listarHistorial() {
+
+        List<Object[]> lista = new ArrayList<>();
+
+        String sql = """
+            SELECT 
+                s.id_solicitud,
+                e.nombres + ' ' + e.apellidos AS empleado,
+                c.nombres + ' ' + c.apellidos AS conductor,
+                s.destino,
+                s.motivo_viaje,
+                s.motivo_respuesta,
+                s.pasajeros,
+                s.fecha_salida,
+                s.fecha_regreso,
+                s.estado
+            FROM Solicitudes s
+            INNER JOIN Empleados e
+                ON s.id_empleado = e.id_empleado
+            INNER JOIN Empleados c
+                ON s.id_conductor = c.id_empleado
+            WHERE s.estado IN ('FINALIZADA', 'RECHAZADA', 'CANCELADA')
+            ORDER BY s.fecha_estado DESC
+        """;
+
+        try (Connection con = Conexion.getConexion();
+             PreparedStatement ps = con.prepareStatement(sql);
+             ResultSet rs = ps.executeQuery()) {
+
+            while (rs.next()) {
+
+                String motivo = rs.getString("motivo_viaje");
+                String respuesta = rs.getString("motivo_respuesta");
+                String estado = rs.getString("estado");
+
+                if (respuesta != null && !respuesta.trim().isEmpty()) {
+                    motivo += " | (" + estado + ") " + respuesta;
+                }
+
+                lista.add(new Object[]{
+                    rs.getInt("id_solicitud"),
+                    rs.getString("empleado"),
+                    rs.getString("conductor"),
+                    rs.getString("destino"),
+                    motivo,
+                    rs.getInt("pasajeros"),
+                    rs.getDate("fecha_salida"),
+                    rs.getDate("fecha_regreso"),
+                    estado
+                });
+            }
+
+        } catch (SQLException e) {
+            System.out.println("Error historial: " + e.getMessage());
+        }
+
+        return lista;
     }
 }

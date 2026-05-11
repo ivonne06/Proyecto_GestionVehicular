@@ -49,7 +49,7 @@ public class FrmSolicitudesAdmin extends javax.swing.JInternalFrame {
             return -1;
         }
 
-        String estado = tblSolicitudes.getValueAt(fila, 7).toString();
+        String estado = tblSolicitudes.getValueAt(fila, 8).toString();
 
         return Integer.parseInt(tblSolicitudes.getValueAt(fila, 0).toString());
     }
@@ -59,7 +59,7 @@ public class FrmSolicitudesAdmin extends javax.swing.JInternalFrame {
         int id = obtenerIdSeleccionado();
         if (id == -1) return;
 
-        String estado = tblSolicitudes.getValueAt(tblSolicitudes.getSelectedRow(), 7).toString();
+        String estado = tblSolicitudes.getValueAt(tblSolicitudes.getSelectedRow(), 8).toString();
 
         String motivo = JOptionPane.showInputDialog(this,
                 "Ingrese motivo de " + accion.toLowerCase() + ":");
@@ -117,7 +117,7 @@ public class FrmSolicitudesAdmin extends javax.swing.JInternalFrame {
             return;
         }
 
-        String estado = tblSolicitudes.getValueAt(fila, 7).toString();
+        String estado = tblSolicitudes.getValueAt(fila, 8).toString();
 
         switch (estado.toUpperCase()) {
 
@@ -181,13 +181,13 @@ public class FrmSolicitudesAdmin extends javax.swing.JInternalFrame {
 
         tblSolicitudes.setModel(new javax.swing.table.DefaultTableModel(
             new Object [][] {
-                {null, null, null, null, null, null, null, null},
-                {null, null, null, null, null, null, null, null},
-                {null, null, null, null, null, null, null, null},
-                {null, null, null, null, null, null, null, null}
+                {null, null, null, null, null, null, null, null, null},
+                {null, null, null, null, null, null, null, null, null},
+                {null, null, null, null, null, null, null, null, null},
+                {null, null, null, null, null, null, null, null, null}
             },
             new String [] {
-                "Id", "Empleado", "Destino", "Motivo", "Pasajeros", "Salida", "Regreso", "Estado"
+                "Id", "Empleado", "Conductor", "Destino", "Motivo", "Pasajeros", "Salida", "Regreso", "Estado"
             }
         ));
         tblSolicitudes.addMouseListener(new java.awt.event.MouseAdapter() {
@@ -196,6 +196,9 @@ public class FrmSolicitudesAdmin extends javax.swing.JInternalFrame {
             }
         });
         jScrollPane1.setViewportView(tblSolicitudes);
+        if (tblSolicitudes.getColumnModel().getColumnCount() > 0) {
+            tblSolicitudes.getColumnModel().getColumn(2).setHeaderValue("Conductor");
+        }
 
         btnAprovar.setText("Aprobar");
         btnAprovar.addActionListener(new java.awt.event.ActionListener() {

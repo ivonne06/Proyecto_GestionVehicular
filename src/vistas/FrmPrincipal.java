@@ -143,6 +143,7 @@ public class FrmPrincipal extends javax.swing.JFrame {
         mItemSolicitudes = new javax.swing.JMenuItem();
         mItemAsignaciones = new javax.swing.JMenuItem();
         mItemDevolucionVehiculo = new javax.swing.JMenuItem();
+        mItemHistorialSolicitudes = new javax.swing.JMenuItem();
         mItemReportes = new javax.swing.JMenuItem();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
@@ -225,6 +226,14 @@ public class FrmPrincipal extends javax.swing.JFrame {
         });
         men.add(mItemDevolucionVehiculo);
 
+        mItemHistorialSolicitudes.setText("Historial Solicitudes");
+        mItemHistorialSolicitudes.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                mItemHistorialSolicitudesActionPerformed(evt);
+            }
+        });
+        men.add(mItemHistorialSolicitudes);
+
         mItemReportes.setText("Reportes");
         men.add(mItemReportes);
 
@@ -305,6 +314,10 @@ public class FrmPrincipal extends javax.swing.JFrame {
         abrirFormulario(new FrmDevolucionVehiculo());
     }//GEN-LAST:event_mItemDevolucionVehiculoActionPerformed
 
+    private void mItemHistorialSolicitudesActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_mItemHistorialSolicitudesActionPerformed
+       abrirFormulario(new FrmHistorialSolicitudes(userSesion));
+    }//GEN-LAST:event_mItemHistorialSolicitudesActionPerformed
+
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JDesktopPane escritorio;
@@ -312,6 +325,7 @@ public class FrmPrincipal extends javax.swing.JFrame {
     private javax.swing.JMenuItem mItemAsignaciones;
     private javax.swing.JMenuItem mItemDevolucionVehiculo;
     private javax.swing.JMenuItem mItemEmpleados;
+    private javax.swing.JMenuItem mItemHistorialSolicitudes;
     private javax.swing.JMenuItem mItemReportes;
     private javax.swing.JMenuItem mItemSesion;
     private javax.swing.JMenuItem mItemSolicitudes;
