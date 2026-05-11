@@ -29,26 +29,27 @@ public class FrmAsignacionVehiculos extends javax.swing.JInternalFrame {
     private void cargarSolicitudes() {
 
         SolicitudDao dao = new SolicitudDao();
+
         List<Object[]> lista = dao.listarTodas();
 
         DefaultTableModel modelo = (DefaultTableModel) tblSolicitudes.getModel();
+
         modelo.setRowCount(0);
 
         for (Object[] fila : lista) {
 
-            String estado = fila[7].toString();
+            String estado = fila[8].toString().trim();
 
-
-            if (estado.equals("APROBADA")) {
+            if (estado.equalsIgnoreCase("APROBADA")) {
 
                 modelo.addRow(new Object[]{
-                    fila[0], // id
-                    fila[1], // empleado
-                    fila[2], // destino
-                    fila[4], // pasajeros
-                    fila[5], // salida
-                    fila[6], // regreso
-                    fila[7]  // estado
+                    fila[0], // ID
+                    fila[1], // EMPLEADO
+                    fila[3], // DESTINO
+                    fila[5], // PASAJEROS
+                    fila[6], // FECHA SALIDA
+                    fila[7], // FECHA REGRESO
+                    fila[8]  // ESTADO
                 });
             }
         }
@@ -58,27 +59,38 @@ public class FrmAsignacionVehiculos extends javax.swing.JInternalFrame {
 
         int fila = tblSolicitudes.getSelectedRow();
 
-        if (fila == -1) return;
+        if (fila == -1) {
+            return;
+        }
 
         try {
 
-            int pasajeros = Integer.parseInt(tblSolicitudes.getValueAt(fila, 3).toString());
+            int pasajeros = Integer.parseInt( tblSolicitudes.getValueAt(fila, 3).toString());
 
-            java.sql.Date salida = java.sql.Date.valueOf(tblSolicitudes.getValueAt(fila, 4).toString());
-            java.sql.Date regreso = java.sql.Date.valueOf(tblSolicitudes.getValueAt(fila, 5).toString());
+            java.util.Date salida = java.sql.Date.valueOf( tblSolicitudes.getValueAt(fila, 4).toString());
+
+            java.util.Date regreso = java.sql.Date.valueOf( tblSolicitudes.getValueAt(fila, 5).toString());
 
             VehiculoDAO dao = new VehiculoDAO();
-        List<Vehiculo> lista = dao.listar(); 
+
+            List<Vehiculo> lista =
+                    dao.listarDisponibles(
+                        salida,
+                        regreso,
+                        pasajeros
+                    );
 
             DefaultTableModel modelo = (DefaultTableModel) tblVehiculos.getModel();
-            modelo.setRowCount(0);
 
+            modelo.setRowCount(0);
+            
             if (lista.isEmpty()) {
-                JOptionPane.showMessageDialog(this, "No hay vehículos disponibles");
+                JOptionPane.showMessageDialog( this,"No hay vehículos disponibles");
                 return;
             }
 
             for (Vehiculo v : lista) {
+
                 modelo.addRow(new Object[]{
                     v.getId(),
                     v.getMarca(),
@@ -90,11 +102,10 @@ public class FrmAsignacionVehiculos extends javax.swing.JInternalFrame {
             }
 
         } catch (Exception e) {
-            JOptionPane.showMessageDialog(this, "Error: " + e.getMessage());
+            JOptionPane.showMessageDialog( this, "Error: " + e.getMessage());
             e.printStackTrace();
         }
     }
-
     /**
      * This method is called from within the constructor to initialize the form.
      * WARNING: Do NOT modify this code. The content of this method is always
