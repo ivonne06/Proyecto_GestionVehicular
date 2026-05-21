@@ -107,7 +107,7 @@ public class FrmPrincipal extends javax.swing.JFrame {
             mItemSolicitudes.setVisible(true);
             mItemAsignaciones.setVisible(true);
             mItemDevolucionVehiculo.setVisible(true);
-            mItemReportes.setVisible(false);
+            mItemReportes.setVisible(true);
         }
 
 
@@ -235,6 +235,11 @@ public class FrmPrincipal extends javax.swing.JFrame {
         men.add(mItemHistorialSolicitudes);
 
         mItemReportes.setText("Reportes");
+        mItemReportes.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                mItemReportesActionPerformed(evt);
+            }
+        });
         men.add(mItemReportes);
 
         jMenuBar1.add(men);
@@ -317,6 +322,19 @@ public class FrmPrincipal extends javax.swing.JFrame {
     private void mItemHistorialSolicitudesActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_mItemHistorialSolicitudesActionPerformed
        abrirFormulario(new FrmHistorialSolicitudes(userSesion));
     }//GEN-LAST:event_mItemHistorialSolicitudesActionPerformed
+
+    private void mItemReportesActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_mItemReportesActionPerformed
+        String rol = userSesion.getRol().toUpperCase();
+        switch (rol) {
+            case "ENCARGADO":
+            case "ADMIN":
+                abrirFormulario(new FrmReportes());
+                break;
+
+            default:
+                JOptionPane.showMessageDialog(this, "Rol no autorizado");
+        }
+    }//GEN-LAST:event_mItemReportesActionPerformed
 
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
