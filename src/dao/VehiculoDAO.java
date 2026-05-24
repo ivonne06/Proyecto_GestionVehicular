@@ -12,10 +12,6 @@ public class VehiculoDAO {
     // INSERTAR
     public boolean insertar(Vehiculo v) {
 
-        if (v.getEstado().equals("ASIGNADO")) {
-            throw new IllegalArgumentException("No se puede registrar un vehículo como ASIGNADO");
-        }
-
         String sql = "INSERT INTO Vehiculos (marca, modelo, placa, pasajeros, tipo, estado) VALUES (?, ?, ?, ?, ?, ?)";
 
         try (Connection con = Conexion.getConexion();
@@ -101,7 +97,7 @@ public class VehiculoDAO {
 
     // INHABILITAR
     public boolean inhabilitar(int id) {
-        String sql = "UPDATE Vehiculos SET estado='INHABILITADO' WHERE id_vehiculo=? AND estado <> 'ASIGNADO'";
+        String sql = "UPDATE Vehiculos SET estado='INHABILITADO' WHERE id_vehiculo=?";
 
         try (Connection con = Conexion.getConexion();
              PreparedStatement ps = con.prepareStatement(sql)) {

@@ -229,25 +229,19 @@ public class FrmDevolucionVehiculo extends javax.swing.JInternalFrame {
 
             if (kmSalida < 0 || kmRegreso < 0) {
 
-                JOptionPane.showMessageDialog(this,
-                        "Los kilometrajes deben ser positivos");
-
+                JOptionPane.showMessageDialog(this, "Los kilometrajes deben ser positivos");
                 return false;
             }
 
             if (kmRegreso <= kmSalida) {
 
-                JOptionPane.showMessageDialog(this,
-                        "El kilometraje de regreso debe ser mayor");
-
+                JOptionPane.showMessageDialog(this,"El kilometraje de regreso debe ser mayor");
                 return false;
             }
 
         } catch (NumberFormatException e) {
 
-            JOptionPane.showMessageDialog(this,
-                    "Ingrese valores numéricos válidos");
-
+            JOptionPane.showMessageDialog(this, "Ingrese valores numéricos válidos");
             return false;
         }
 
