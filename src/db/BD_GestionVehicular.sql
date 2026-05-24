@@ -479,7 +479,7 @@ GO
 -- =========================================
 
 IF OBJECT_ID('dbo.sp_vehiculos_disponibles_v2', 'P') IS NOT NULL
-    DROP PROCEDURE dbo.sp_asignar_vehiculo;
+    DROP PROCEDURE dbo.sp_vehiculos_disponibles_v2;
 GO
 
 GO
@@ -516,6 +516,43 @@ BEGIN
         )
     );
 END;
+GO
+
+-- =========================================
+-- SP: Reporte Solicitudes
+-- =========================================
+IF OBJECT_ID('dbo.sp_reporte_solicitudes', 'P') IS NOT NULL
+    DROP PROCEDURE dbo.reporte_solicitudes;
+GO
+
+GO
+
+CREATE PROCEDURE sp_reporte_solicitudes
+    @fechaInicio DATE=NULL,
+    @fechaFin DATE=NULL,
+    @estado VARCHAR(20)=NULL,
+    @empleado INT=NULL
+AS
+BEGIN
+
+	SELECT COUNT(*) total,
+
+	SUM(CASE WHEN estado='APROBADA' THEN 1 ELSE 0 END) aprobadas,
+
+	SUM(CASE WHEN estado='RECHAZADA' THEN 1 ELSE 0 END) rechazadas,
+
+	SUM(CASE WHEN estado='CANCELADA' THEN 1 ELSE 0 END) canceladas,
+
+	SUM(CASE WHEN estado='FINALIZADA' THEN 1 ELSE 0 END) finalizadas
+
+	FROM Solicitudes
+
+	WHERE	(@fechaInicio IS NULL OR fecha_salida>=@fechaInicio)
+	AND	(@fechaFin IS NULL OR fecha_regreso<=@fechaFin)
+	AND	(@estado IS NULL OR estado=@estado)
+	AND	(@empleado IS NULL OR id_empleado=@empleado)
+
+END
 GO
 
 -- ======================================================
@@ -599,4 +636,4 @@ VALUES
 (5, 5, '2026-06-15', '2026-06-16', 'La Libertad', 'Supervisión de rutas', NULL, 2, 'PENDIENTE');
 
 GO
-SELECT 'Seeders cargados con éxito' as Mensaje;-- ======================================================
+SELECT 'Seeders cargados con éxito' as Mensaje;
