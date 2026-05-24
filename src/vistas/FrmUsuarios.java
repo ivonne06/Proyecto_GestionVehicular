@@ -46,6 +46,7 @@ public class FrmUsuarios extends javax.swing.JInternalFrame {
         btnActualizar.setEnabled(false);
         btnActivar.setEnabled(false);
         btnDesactivar.setEnabled(false);
+        cmbRol.setEnabled(true);
     }
 
 
@@ -200,7 +201,20 @@ public class FrmUsuarios extends javax.swing.JInternalFrame {
 
     private void btnActualizarActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnActualizarActionPerformed
         try {
+
             int id = Integer.parseInt(txtId.getText());
+            String username = txtUserName.getText();
+
+            if (username.equalsIgnoreCase("admin")) {
+                JOptionPane.showMessageDialog(
+                    this,
+                    "El usuario maestro ADMIN no permite modificación de rol.",
+                    "Acción bloqueada",
+                    JOptionPane.WARNING_MESSAGE
+                );
+                return;
+            }
+
             String rol = cmbRol.getSelectedItem().toString();
 
             if (dao.actualizarRol(id, rol)) {
@@ -221,19 +235,42 @@ public class FrmUsuarios extends javax.swing.JInternalFrame {
         txtUserName.setText(tblUsuarios.getValueAt(fila, 1).toString()); 
         cmbRol.setSelectedItem(tblUsuarios.getValueAt(fila, 3).toString()); 
         String estado = tblUsuarios.getValueAt(fila, 4).toString(); 
-        if (estado.equals("ACTIVO")) { 
-            btnActivar.setEnabled(false); 
-            btnDesactivar.setEnabled(true); 
-        } else { 
-            btnActivar.setEnabled(true); 
-            btnDesactivar.setEnabled(false); 
-        } 
-        btnActualizar.setEnabled(true);
+        
+        String username = txtUserName.getText();
+
+        if (username.equalsIgnoreCase("admin")) {
+            btnActualizar.setEnabled(false);
+            btnDesactivar.setEnabled(false);
+            btnActivar.setEnabled(false);
+            cmbRol.setEnabled(false);
+        } else {
+            cmbRol.setEnabled(true);
+            btnActualizar.setEnabled(true);
+
+            if (estado.equals("ACTIVO")) {
+                btnActivar.setEnabled(false);
+                btnDesactivar.setEnabled(true);
+            } else {
+                btnActivar.setEnabled(true);
+                btnDesactivar.setEnabled(false);
+            }
+        }
     }//GEN-LAST:event_tblUsuariosMouseClicked
 
     private void btnDesactivarActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnDesactivarActionPerformed
         try {
             int id = Integer.parseInt(txtId.getText());
+            String username = txtUserName.getText();
+
+            if (username.equalsIgnoreCase("admin")) {
+                JOptionPane.showMessageDialog(
+                    this,
+                    "El usuario maestro ADMIN no puede desactivarse.",
+                    "Acción bloqueada",
+                    JOptionPane.WARNING_MESSAGE
+                );
+                return;
+            }
 
             int confirm = JOptionPane.showConfirmDialog(this,
                 "¿Desea desactivar este usuario?",

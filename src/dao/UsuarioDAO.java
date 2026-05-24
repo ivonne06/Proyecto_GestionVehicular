@@ -105,10 +105,25 @@ public class UsuarioDAO {
 
     // DESACTIVAR
     public boolean desactivar(int id) {
+        String validar = "SELECT username FROM Usuarios WHERE id_usuario = ?";
         String sql = "UPDATE Usuarios SET estado = 0 WHERE id_usuario = ?";
-        try (Connection con = Conexion.getConexion();
-             PreparedStatement ps = con.prepareStatement(sql)) {
 
+        try (Connection con = Conexion.getConexion()) {
+
+            PreparedStatement psValidar = con.prepareStatement(validar);
+            psValidar.setInt(1, id);
+
+            ResultSet rs = psValidar.executeQuery();
+
+            if (rs.next()) {
+                String user = rs.getString("username");
+
+                if ("admin".equalsIgnoreCase(user)) {
+                    return false;
+                }
+            }
+
+            PreparedStatement ps = con.prepareStatement(sql);
             ps.setInt(1, id);
 
             return ps.executeUpdate() > 0;
@@ -121,16 +136,37 @@ public class UsuarioDAO {
 
     // EDITAR USUARIO
     public boolean actualizarRol(int id, String rol) {
+
+        String validar = "SELECT username FROM Usuarios WHERE id_usuario = ?";
         String sql = "UPDATE Usuarios SET rol=? WHERE id_usuario=?";
-        try {
-            con = Conexion.getConexion();
-            ps = con.prepareStatement(sql);
+
+        try (Connection con = Conexion.getConexion()) {
+
+            PreparedStatement psValidar = con.prepareStatement(validar);
+            psValidar.setInt(1, id);
+
+            ResultSet rs = psValidar.executeQuery();
+
+            if (rs.next()) {
+
+                String user = rs.getString("username");
+
+                if ("admin".equalsIgnoreCase(user)) {
+                    return false;
+                }
+            }
+
+            PreparedStatement ps = con.prepareStatement(sql);
+
             ps.setString(1, rol);
             ps.setInt(2, id);
+
             return ps.executeUpdate() > 0;
+
         } catch (SQLException e) {
-            System.out.println("Error al actulizar el rol: " + e.getMessage());
+            System.out.println("Error al actualizar rol: " + e.getMessage());
         }
+
         return false;
     }
     
