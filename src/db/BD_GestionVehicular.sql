@@ -89,7 +89,7 @@ CREATE TABLE Vehiculos (
 
     -- CHECK
     CONSTRAINT chk_vehiculos_estado 
-        CHECK (estado IN ('DISPONIBLE', 'ASIGNADO', 'MANTENIMIENTO', 'INHABILITADO'))
+        CHECK (estado IN ('DISPONIBLE', 'MANTENIMIENTO', 'INHABILITADO'))
 );
 
 -- =========================
@@ -309,7 +309,7 @@ BEGIN
 END;
 
 
--- CAMBIAR ESTADO VEHICULO A ASIGNADO
+-- CAMBIAR ESTADO SOLICITUD A ASIGNADA
 DROP TRIGGER IF EXISTS trg_solicitud_asignada;
 GO
 
@@ -637,3 +637,5 @@ VALUES
 
 GO
 SELECT 'Seeders cargados con éxito' as Mensaje;
+
+select * from Usuarios;

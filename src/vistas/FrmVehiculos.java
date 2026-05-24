@@ -75,7 +75,7 @@ public class FrmVehiculos extends javax.swing.JInternalFrame {
             }
         });
 
-        cmbTipo.setModel(new javax.swing.DefaultComboBoxModel<>(new String[] { "Seleccionar...", "Sedan", "Camioneta", "Pickup", " " }));
+        cmbTipo.setModel(new javax.swing.DefaultComboBoxModel<>(new String[] { "Seleccionar...", "Sedan", "Camioneta", "Pickup" }));
 
         Tipo.setText("Tipo: ");
 
@@ -414,9 +414,9 @@ public class FrmVehiculos extends javax.swing.JInternalFrame {
         try {
             int pasajeros = Integer.parseInt(txtPasajeros.getText());
             
-            if (pasajeros < 2) {
+            if (pasajeros < 2 || pasajeros > 10) {
                 throw new Exception(
-                    "Un vehículo debe permitir mínimo 2 pasajeros."
+                    "Un vehículo debe permitir mínimo 2 pasajeros, máximo 10."
                 );
             }
         } catch (NumberFormatException e) {
