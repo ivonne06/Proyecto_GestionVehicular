@@ -18,7 +18,6 @@ public class FrmEmpleados extends javax.swing.JInternalFrame {
         cargarTabla();
         formatoDui();
         formatoTelefono();
-        
         ButtonGroup grupoLicencia = new ButtonGroup();
         grupoLicencia.add(rbSiLicencia);
         grupoLicencia.add(rbNoLicencia);
@@ -42,7 +41,6 @@ public class FrmEmpleados extends javax.swing.JInternalFrame {
     private void initComponents() {
 
         jLabel9 = new javax.swing.JLabel();
-        txtTelefono = new javax.swing.JFormattedTextField();
         jLabel1 = new javax.swing.JLabel();
         txtNombres = new javax.swing.JTextField();
         txtApellidos = new javax.swing.JTextField();
@@ -68,6 +66,7 @@ public class FrmEmpleados extends javax.swing.JInternalFrame {
         jLabel7 = new javax.swing.JLabel();
         btnLimpiar1 = new javax.swing.JButton();
         cmbLicencia = new javax.swing.JComboBox<>();
+        txtTelefono = new javax.swing.JTextField();
 
         setClosable(true);
         setIconifiable(true);
@@ -75,12 +74,6 @@ public class FrmEmpleados extends javax.swing.JInternalFrame {
 
         jLabel9.setFont(new java.awt.Font("sansserif", 1, 14)); // NOI18N
         jLabel9.setText("REGISTROS DE EMPLEADOS");
-
-        try {
-            txtTelefono.setFormatterFactory(new javax.swing.text.DefaultFormatterFactory(new javax.swing.text.MaskFormatter("####-####")));
-        } catch (java.text.ParseException ex) {
-            ex.printStackTrace();
-        }
 
         jLabel1.setText("Nombres:");
 
@@ -327,15 +320,77 @@ public class FrmEmpleados extends javax.swing.JInternalFrame {
         }
     }
     
-    private void formatoTelefono(){
-       try {
-            MaskFormatter formatter = new MaskFormatter("####-####");
-            formatter.setPlaceholderCharacter('_');
-            txtTelefono.setFormatterFactory(new DefaultFormatterFactory(formatter));
-        } catch (ParseException e) {
-            e.printStackTrace();
+    private void formatoTelefono() {
+
+        txtTelefono.addKeyListener(new java.awt.event.KeyAdapter() {
+
+            @Override
+            public void keyTyped(java.awt.event.KeyEvent evt) {
+
+                char c = evt.getKeyChar();
+
+                // permitir backspace
+                if (c == '\b') {
+                    return;
+                }
+
+                // SOLO NUMEROS
+                if (!Character.isDigit(c)) {
+                    evt.consume();
+                    return;
+                }
+
+                String texto = txtTelefono.getText()
+                        .replace("-", "");
+
+                // MAXIMO 8 DIGITOS
+                if (texto.length() >= 8) {
+                    evt.consume();
+                }
+            }
+
+            @Override
+            public void keyReleased(java.awt.event.KeyEvent evt) {
+
+                String telefono = txtTelefono.getText()
+                        .replace("-", "");
+
+                // ELIMINAR TODO LO QUE NO SEA NUMERO
+                telefono = telefono.replaceAll("[^0-9]", "");
+
+                // MAXIMO 8 DIGITOS
+                if (telefono.length() > 8) {
+                    telefono = telefono.substring(0, 8);
+                }
+
+                // INSERTAR GUION AUTOMATICO
+                if (telefono.length() > 4) {
+
+                    telefono =
+                            telefono.substring(0, 4)
+                            + "-"
+                            + telefono.substring(4);
+                }
+
+                txtTelefono.setText(telefono);
+
+                // CURSOR AL FINAL
+                txtTelefono.setCaretPosition(
+                        txtTelefono.getText().length()
+                );
+            }
+        });
+    }
+    
+    private void validarSoloLetras(String texto, String campo) throws Exception {
+
+        if (!texto.trim().matches("[a-zA-ZÁÉÍÓÚáéíóúÑñ ]+")) {
+
+            throw new Exception(
+                    "El campo " + campo + " solo debe contener letras."
+            );
         }
-   }
+    }
     
     private void validarCampos() throws Exception {
         if (txtNombres.getText().trim().isEmpty() ||
@@ -345,13 +400,25 @@ public class FrmEmpleados extends javax.swing.JInternalFrame {
 
             throw new Exception("Todos los campos deben completarse.");
         }
+        
+        validarSoloLetras(txtNombres.getText(), "Nombres");
+        validarSoloLetras(txtApellidos.getText(), "Apellidos");
+        validarSoloLetras(txtCargo.getText(), "Cargo");
+        validarSoloLetras(txtDepartamento.getText(), "Departamento");
 
         if (txtDui.getText().contains("_")) {
             throw new Exception("Complete el DUI.");
         }
+        
+        String telefono = txtTelefono.getText().replace("-", "");
 
-        if (txtTelefono.getText().contains("_")) {
-            throw new Exception("Complete el teléfono.");
+        if (!(telefono.startsWith("7") || telefono.startsWith("6")
+                || telefono.startsWith("2"))) {
+            throw new Exception("El teléfono debe iniciar con 2, 6 o 7");
+        }
+
+        if (telefono.length() != 8) {
+            throw new Exception("El teléfono debe tener 8 dígitos.");
         }
     }
     
@@ -570,6 +637,6 @@ public class FrmEmpleados extends javax.swing.JInternalFrame {
     private javax.swing.JFormattedTextField txtDui;
     private javax.swing.JTextField txtIdEmpleado;
     private javax.swing.JTextField txtNombres;
-    private javax.swing.JFormattedTextField txtTelefono;
+    private javax.swing.JTextField txtTelefono;
     // End of variables declaration//GEN-END:variables
 }

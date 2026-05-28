@@ -19,6 +19,7 @@ public class FrmBuscarConductor extends javax.swing.JDialog {
             java.util.Date salida, java.util.Date regreso) {
         super(parent, modal);
         initComponents();
+        this.setLocationRelativeTo(null);
         tblConductores.setDefaultRenderer(
             Object.class, new javax.swing.table.DefaultTableCellRenderer() {
 

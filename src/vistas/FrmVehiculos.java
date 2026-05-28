@@ -293,7 +293,7 @@ public class FrmVehiculos extends javax.swing.JInternalFrame {
         btnHabilitar.setEnabled(false);
     }
     
-   private void validarFormatoPlaca() {
+    private void validarFormatoPlaca() {
 
         txtPlaca.setText("P");
 
