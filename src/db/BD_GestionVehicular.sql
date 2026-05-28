@@ -637,5 +637,3 @@ VALUES
 
 GO
 SELECT 'Seeders cargados con éxito' as Mensaje;
-
-select * from Usuarios;

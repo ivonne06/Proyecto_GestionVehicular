@@ -75,7 +75,13 @@ public class FrmSolicitudesAdmin extends javax.swing.JInternalFrame {
 
             case "APROBAR":
                 if (!estado.equalsIgnoreCase("PENDIENTE")) {
-                    JOptionPane.showMessageDialog(this, "Solo se pueden aprobar solicitudes pendientes");
+                    JOptionPane.showMessageDialog(this,"Solo se pueden aprobar solicitudes pendientes");
+                    return;
+                }
+
+                // VALIDAR DISPONIBILIDAD DEL CONDUCTOR
+                if (!dao.conductorDisponibleParaAprobacion(id)) {
+                    JOptionPane.showMessageDialog(this,"El conductor ya tiene otro viaje aprobado/asignado en esas fechas");
                     return;
                 }
                 ok = dao.aprobar(id, motivo);
@@ -94,7 +100,7 @@ public class FrmSolicitudesAdmin extends javax.swing.JInternalFrame {
                     JOptionPane.showMessageDialog(this, "No se puede cancelar esta solicitud");
                     return;
                 }
-                ok = dao.cancelarAdmin(id, motivo); // el método unificado que te dije
+                ok = dao.cancelarAdmin(id, motivo);
                 break;
         }
 

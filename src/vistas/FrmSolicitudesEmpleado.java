@@ -559,7 +559,18 @@ public class FrmSolicitudesEmpleado extends javax.swing.JInternalFrame {
     }//GEN-LAST:event_tblSolicitudesMouseClicked
 
     private void btnBuscarActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnBuscarActionPerformed
-        FrmBuscarConductor frm = new FrmBuscarConductor(null, true);
+        if (dcSalida.getDate() == null || dcRegreso.getDate() == null) {
+            JOptionPane.showMessageDialog(this,"Debe seleccionar las fechas antes de buscar conductor");
+            return;
+        }
+        
+        FrmBuscarConductor frm =
+            new FrmBuscarConductor(
+                null,
+                true,
+                dcSalida.getDate(),
+                dcRegreso.getDate()
+            );
         frm.setVisible(true);
 
         if (frm.idSeleccionado != 0) {
