@@ -75,14 +75,37 @@
                 <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="mItemDevolucionVehiculoActionPerformed"/>
               </Events>
             </MenuItem>
-            <MenuItem class="javax.swing.JMenuItem" name="mItemHistorialSolicitudes">
+            <Menu class="javax.swing.JMenu" name="menuHistoriales">
               <Properties>
-                <Property name="text" type="java.lang.String" value="Historial Solicitudes"/>
+                <Property name="text" type="java.lang.String" value="Historiales"/>
               </Properties>
-              <Events>
-                <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="mItemHistorialSolicitudesActionPerformed"/>
-              </Events>
-            </MenuItem>
+              <SubComponents>
+                <MenuItem class="javax.swing.JMenuItem" name="mItemHistorialSolicitudes">
+                  <Properties>
+                    <Property name="text" type="java.lang.String" value="Historial Solicitudes"/>
+                  </Properties>
+                  <Events>
+                    <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="mItemHistorialSolicitudesActionPerformed"/>
+                  </Events>
+                </MenuItem>
+                <MenuItem class="javax.swing.JMenuItem" name="mItemHistorialAsignaciones">
+                  <Properties>
+                    <Property name="text" type="java.lang.String" value="Historial Asiganaciones"/>
+                  </Properties>
+                  <Events>
+                    <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="mItemHistorialAsignacionesActionPerformed"/>
+                  </Events>
+                </MenuItem>
+                <MenuItem class="javax.swing.JMenuItem" name="mItemHistorialDevoluciones">
+                  <Properties>
+                    <Property name="text" type="java.lang.String" value="Historial Devoluciones "/>
+                  </Properties>
+                  <Events>
+                    <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="mItemHistorialDevolucionesActionPerformed"/>
+                  </Events>
+                </MenuItem>
+              </SubComponents>
+            </Menu>
             <MenuItem class="javax.swing.JMenuItem" name="mItemReportes">
               <Properties>
                 <Property name="text" type="java.lang.String" value="Reportes"/>

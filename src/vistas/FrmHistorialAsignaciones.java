@@ -21,7 +21,9 @@ public class FrmHistorialAsignaciones extends javax.swing.JInternalFrame {
         cargarHistorial();
     }
     
-    private void cargarHistorial() {
+   private void cargarHistorial() {
+
+    System.out.println("Cargando historial...");
 
     DefaultTableModel modelo =
             (DefaultTableModel) tblHistorial.getModel();
@@ -32,7 +34,12 @@ public class FrmHistorialAsignaciones extends javax.swing.JInternalFrame {
 
     List<Object[]> lista = dao.historialAsignaciones();
 
+    System.out.println("Registros encontrados: " + lista.size());
+
     for (Object[] fila : lista) {
+
+        System.out.println("Fila encontrada");
+
         modelo.addRow(fila);
     }
 }
@@ -53,6 +60,11 @@ public class FrmHistorialAsignaciones extends javax.swing.JInternalFrame {
         lblBuscar = new javax.swing.JLabel();
         txtBuscar = new javax.swing.JTextField();
         btnBuscar = new javax.swing.JButton();
+
+        setClosable(true);
+        setIconifiable(true);
+        setMaximizable(true);
+        setResizable(true);
 
         lblTitulo.setText("HISTORIAL DE ASIGNACIONES VEHICULARES");
 

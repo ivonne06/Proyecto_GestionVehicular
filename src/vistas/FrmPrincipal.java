@@ -95,6 +95,7 @@ public class FrmPrincipal extends javax.swing.JFrame {
             mItemSolicitudes.setVisible(true);
             mItemAsignaciones.setVisible(true);
             mItemDevolucionVehiculo.setVisible(true);
+            menuHistoriales.setVisible(true);
             mItemReportes.setVisible(true);
         }
 
@@ -107,6 +108,7 @@ public class FrmPrincipal extends javax.swing.JFrame {
             mItemSolicitudes.setVisible(true);
             mItemAsignaciones.setVisible(true);
             mItemDevolucionVehiculo.setVisible(true);
+            menuHistoriales.setVisible(true);
             mItemReportes.setVisible(true);
         }
 
@@ -119,7 +121,12 @@ public class FrmPrincipal extends javax.swing.JFrame {
             mItemDevolucionVehiculo.setVisible(false);
             mItemReportes.setVisible(false);
             
-            mItemSolicitudes.setVisible(true); 
+            mItemSolicitudes.setVisible(true);
+            menuHistoriales.setVisible(true);
+
+            mItemHistorialSolicitudes.setVisible(true);
+            mItemHistorialDevoluciones.setVisible(false);
+            mItemHistorialAsignaciones.setVisible(false);
         }
     }
 
@@ -143,7 +150,10 @@ public class FrmPrincipal extends javax.swing.JFrame {
         mItemSolicitudes = new javax.swing.JMenuItem();
         mItemAsignaciones = new javax.swing.JMenuItem();
         mItemDevolucionVehiculo = new javax.swing.JMenuItem();
+        menuHistoriales = new javax.swing.JMenu();
         mItemHistorialSolicitudes = new javax.swing.JMenuItem();
+        mItemHistorialAsignaciones = new javax.swing.JMenuItem();
+        mItemHistorialDevoluciones = new javax.swing.JMenuItem();
         mItemReportes = new javax.swing.JMenuItem();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
@@ -226,13 +236,33 @@ public class FrmPrincipal extends javax.swing.JFrame {
         });
         men.add(mItemDevolucionVehiculo);
 
+        menuHistoriales.setText("Historiales");
+
         mItemHistorialSolicitudes.setText("Historial Solicitudes");
         mItemHistorialSolicitudes.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 mItemHistorialSolicitudesActionPerformed(evt);
             }
         });
-        men.add(mItemHistorialSolicitudes);
+        menuHistoriales.add(mItemHistorialSolicitudes);
+
+        mItemHistorialAsignaciones.setText("Historial Asiganaciones");
+        mItemHistorialAsignaciones.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                mItemHistorialAsignacionesActionPerformed(evt);
+            }
+        });
+        menuHistoriales.add(mItemHistorialAsignaciones);
+
+        mItemHistorialDevoluciones.setText("Historial Devoluciones ");
+        mItemHistorialDevoluciones.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                mItemHistorialDevolucionesActionPerformed(evt);
+            }
+        });
+        menuHistoriales.add(mItemHistorialDevoluciones);
+
+        men.add(menuHistoriales);
 
         mItemReportes.setText("Reportes");
         mItemReportes.addActionListener(new java.awt.event.ActionListener() {
@@ -319,17 +349,6 @@ public class FrmPrincipal extends javax.swing.JFrame {
         abrirFormulario(new FrmDevolucionVehiculo());
     }//GEN-LAST:event_mItemDevolucionVehiculoActionPerformed
 
-    private void mItemHistorialSolicitudesActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_mItemHistorialSolicitudesActionPerformed
-       abrirFormulario(new FrmHistorialSolicitudes(userSesion));
-    }//GEN-LAST:event_mItemHistorialSolicitudesActionPerformed
-
-    private void mItemHistorialAsignacionesActionPerformed(
-        java.awt.event.ActionEvent evt) {
-
-    abrirFormulario(new FrmHistorialAsignaciones());
-
-}
-    
     private void mItemReportesActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_mItemReportesActionPerformed
         String rol = userSesion.getRol().toUpperCase();
         switch (rol) {
@@ -344,6 +363,18 @@ public class FrmPrincipal extends javax.swing.JFrame {
         
     }//GEN-LAST:event_mItemReportesActionPerformed
 
+    private void mItemHistorialSolicitudesActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_mItemHistorialSolicitudesActionPerformed
+        abrirFormulario(new FrmHistorialSolicitudes(userSesion));
+    }//GEN-LAST:event_mItemHistorialSolicitudesActionPerformed
+
+    private void mItemHistorialDevolucionesActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_mItemHistorialDevolucionesActionPerformed
+       abrirFormulario(new FrmHistorialDevoluciones());
+    }//GEN-LAST:event_mItemHistorialDevolucionesActionPerformed
+
+    private void mItemHistorialAsignacionesActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_mItemHistorialAsignacionesActionPerformed
+        abrirFormulario(new FrmHistorialAsignaciones());
+    }//GEN-LAST:event_mItemHistorialAsignacionesActionPerformed
+
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JDesktopPane escritorio;
@@ -351,6 +382,8 @@ public class FrmPrincipal extends javax.swing.JFrame {
     private javax.swing.JMenuItem mItemAsignaciones;
     private javax.swing.JMenuItem mItemDevolucionVehiculo;
     private javax.swing.JMenuItem mItemEmpleados;
+    private javax.swing.JMenuItem mItemHistorialAsignaciones;
+    private javax.swing.JMenuItem mItemHistorialDevoluciones;
     private javax.swing.JMenuItem mItemHistorialSolicitudes;
     private javax.swing.JMenuItem mItemReportes;
     private javax.swing.JMenuItem mItemSesion;
@@ -358,6 +391,7 @@ public class FrmPrincipal extends javax.swing.JFrame {
     private javax.swing.JMenuItem mItemUsuarios;
     private javax.swing.JMenuItem mItemVehiculos;
     private javax.swing.JMenu men;
+    private javax.swing.JMenu menuHistoriales;
     private javax.swing.JMenu menuUsuario;
     // End of variables declaration//GEN-END:variables
 }
