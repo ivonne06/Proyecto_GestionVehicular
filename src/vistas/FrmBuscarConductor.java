@@ -12,10 +12,52 @@ public class FrmBuscarConductor extends javax.swing.JDialog {
 
     public int idSeleccionado = 0;
     public String nombreSeleccionado = "";
+    private java.util.Date fechaSalida;
+    private java.util.Date fechaRegreso;
     
-    public FrmBuscarConductor(java.awt.Frame parent, boolean modal) {
+    public FrmBuscarConductor(java.awt.Frame parent, boolean modal,
+            java.util.Date salida, java.util.Date regreso) {
         super(parent, modal);
         initComponents();
+        this.setLocationRelativeTo(null);
+        tblConductores.setDefaultRenderer(
+            Object.class, new javax.swing.table.DefaultTableCellRenderer() {
+
+                @Override
+                public java.awt.Component getTableCellRendererComponent(
+                        javax.swing.JTable table,
+                        Object value,
+                        boolean isSelected,
+                        boolean hasFocus,
+                        int row,
+                        int column
+                ) {
+
+                    java.awt.Component c =
+                        super.getTableCellRendererComponent(
+                            table,
+                            value,
+                            isSelected,
+                            hasFocus,
+                            row,
+                            column
+                        );
+
+                    String estado =
+                        table.getValueAt(row, 3).toString();
+
+                    if (estado.equalsIgnoreCase("NO DISPONIBLE")) {
+                        c.setForeground(java.awt.Color.RED);
+                    } else {
+                        c.setForeground(java.awt.Color.BLACK);
+                    }
+                    return c;
+                }
+            }
+        );
+        
+        this.fechaSalida = salida;
+        this.fechaRegreso = regreso;
         cargarTabla("");
     }
 
@@ -37,13 +79,13 @@ public class FrmBuscarConductor extends javax.swing.JDialog {
 
         tblConductores.setModel(new javax.swing.table.DefaultTableModel(
             new Object [][] {
-                {null, null, null},
-                {null, null, null},
-                {null, null, null},
-                {null, null, null}
+                {null, null, null, null},
+                {null, null, null, null},
+                {null, null, null, null},
+                {null, null, null, null}
             },
             new String [] {
-                "Id", "Nombre", "DUI"
+                "Id", "Nombre", "DUI", "Estado"
             }
         ));
         tblConductores.addMouseListener(new java.awt.event.MouseAdapter() {
@@ -91,10 +133,18 @@ public class FrmBuscarConductor extends javax.swing.JDialog {
     }// </editor-fold>//GEN-END:initComponents
 
     private void cargarTabla(String filtro) {
-        DefaultTableModel modelo = (DefaultTableModel) tblConductores.getModel();
+        DefaultTableModel modelo =
+            (DefaultTableModel) tblConductores.getModel();
+
         modelo.setRowCount(0);
 
-        for (Object[] fila : dao.listarConductores(filtro)) {
+        for (Object[] fila :
+                dao.listarConductores(
+                        filtro,
+                        fechaSalida,
+                        fechaRegreso
+                )) {
+
             modelo.addRow(fila);
         }
     }

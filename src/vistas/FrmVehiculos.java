@@ -1,13 +1,9 @@
 package vistas;
 
 import dao.VehiculoDAO;
-import java.text.ParseException;
-import javax.swing.DefaultComboBoxModel;
 import modelo.Vehiculo;
 import javax.swing.JOptionPane;
 import javax.swing.table.DefaultTableModel;
-import javax.swing.text.DefaultFormatterFactory;
-import javax.swing.text.MaskFormatter;
 
 public class FrmVehiculos extends javax.swing.JInternalFrame {
 
@@ -297,7 +293,7 @@ public class FrmVehiculos extends javax.swing.JInternalFrame {
         btnHabilitar.setEnabled(false);
     }
     
-   private void validarFormatoPlaca() {
+    private void validarFormatoPlaca() {
 
         txtPlaca.setText("P");
 

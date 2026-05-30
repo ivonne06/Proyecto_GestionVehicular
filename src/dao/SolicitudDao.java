@@ -225,7 +225,7 @@ public class SolicitudDao {
     }
     
     //lista solo condutores(empleados) con usuario activo 
-    public List<Object[]> listarConductores(String filtro) {
+    public List<Object[]> listarConductores(String filtro,java.util.Date salida,java.util.Date regreso) {
 
         List<Object[]> lista = new ArrayList<>();
 
@@ -233,24 +233,80 @@ public class SolicitudDao {
             SELECT 
                 e.id_empleado,
                 e.nombres + ' ' + e.apellidos AS nombre,
-                e.dui
+                e.dui,
+
+                CASE
+                    WHEN EXISTS (
+
+                        SELECT 1
+                        FROM Solicitudes s
+                        WHERE s.id_conductor = e.id_empleado
+                        AND s.estado IN ('APROBADA', 'ASIGNADA')
+
+                        AND NOT (
+                            s.fecha_regreso < ?
+                            OR
+                            s.fecha_salida > ?
+                        )
+
+                    )
+                    THEN 'NO DISPONIBLE'
+
+                    ELSE 'DISPONIBLE'
+
+                END estado_disponibilidad
+
             FROM Empleados e
-            INNER JOIN Usuarios u 
+
+            INNER JOIN Usuarios u
                 ON e.id_usuario = u.id_usuario
+
             WHERE e.licencia IS NOT NULL
             AND e.licencia <> 'SIN LICENCIA'
             AND u.estado = 1
+
             AND (
                 e.nombres LIKE ?
                 OR e.dui LIKE ?
             )
+
+            ORDER BY
+
+                CASE
+                    WHEN EXISTS (
+
+                        SELECT 1
+                        FROM Solicitudes s
+                        WHERE s.id_conductor = e.id_empleado
+                        AND s.estado IN ('APROBADA', 'ASIGNADA')
+
+                        AND NOT (
+                            s.fecha_regreso < ?
+                            OR
+                            s.fecha_salida > ?
+                        )
+
+                    )
+                    THEN 1
+                    ELSE 0
+                END,
+
+                e.nombres ASC,
+                e.apellidos ASC
         """;
 
         try (Connection con = Conexion.getConexion();
              PreparedStatement ps = con.prepareStatement(sql)) {
 
-            ps.setString(1, "%" + filtro + "%");
-            ps.setString(2, "%" + filtro + "%");
+            ps.setDate(1, new java.sql.Date(salida.getTime()));
+            ps.setDate(2, new java.sql.Date(regreso.getTime()));
+
+            ps.setString(3, "%" + filtro + "%");
+            ps.setString(4, "%" + filtro + "%");
+            
+            // ORDER BY
+            ps.setDate(5, new java.sql.Date(salida.getTime()));
+            ps.setDate(6, new java.sql.Date(regreso.getTime()));
 
             ResultSet rs = ps.executeQuery();
 
@@ -259,7 +315,8 @@ public class SolicitudDao {
                 lista.add(new Object[]{
                     rs.getInt("id_empleado"),
                     rs.getString("nombre"),
-                    rs.getString("dui")
+                    rs.getString("dui"),
+                    rs.getString("estado_disponibilidad")
                 });
             }
 
@@ -519,5 +576,40 @@ public class SolicitudDao {
         }
 
         return lista;
+    }
+    
+    public boolean conductorDisponibleParaAprobacion(int idSolicitud) {
+
+        String sql = """
+            SELECT COUNT(*)
+            FROM Solicitudes s1
+            INNER JOIN Solicitudes s2
+                ON s1.id_conductor = s2.id_conductor
+            WHERE s1.id_solicitud = ?
+            AND s2.id_solicitud <> s1.id_solicitud
+            AND s2.estado IN ('APROBADA', 'ASIGNADA')
+            AND NOT (
+                s2.fecha_regreso < s1.fecha_salida
+                OR
+                s2.fecha_salida > s1.fecha_regreso
+            )
+        """;
+
+        try (Connection con = Conexion.getConexion();
+             PreparedStatement ps = con.prepareStatement(sql)) {
+
+            ps.setInt(1, idSolicitud);
+
+            ResultSet rs = ps.executeQuery();
+
+            if (rs.next()) {
+                return rs.getInt(1) == 0;
+            }
+
+        } catch (SQLException e) {
+            System.out.println("Error validar aprobación: " + e.getMessage());
+        }
+
+        return false;
     }
 }

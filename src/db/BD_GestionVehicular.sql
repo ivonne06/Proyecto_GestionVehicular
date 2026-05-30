@@ -457,6 +457,39 @@ BEGIN
         RETURN;
     END
 
+    -- =====================================
+    -- VALIDAR DISPONIBILIDAD DEL CONDUCTOR
+    -- =====================================
+    IF EXISTS (
+
+        SELECT 1
+        FROM Solicitudes s
+
+        WHERE s.id_conductor = (
+            SELECT id_conductor
+            FROM Solicitudes
+            WHERE id_solicitud = @id_solicitud
+        )
+
+        AND s.id_solicitud <> @id_solicitud
+
+        AND s.estado IN ('APROBADA', 'ASIGNADA')
+
+        AND NOT (
+            s.fecha_regreso < @fecha_salida
+            OR
+            s.fecha_salida > @fecha_regreso
+        )
+    )
+    BEGIN
+        RAISERROR(
+            'El conductor ya tiene un viaje asignado en esas fechas',
+            16,
+            1
+        );
+        RETURN;
+    END
+
     -- VALIDAR QUE NO ESTÉ YA ASIGNADA
     IF EXISTS (
         SELECT 1 FROM Asignaciones 
@@ -637,5 +670,3 @@ VALUES
 
 GO
 SELECT 'Seeders cargados con éxito' as Mensaje;
-
-select * from Usuarios;
