@@ -4,6 +4,7 @@ import conexion.Conexion;
 import java.sql.*;
 import java.util.ArrayList;
 import java.util.List;
+import java.text.SimpleDateFormat;
 
 public class HistorialDAO {
 
@@ -153,6 +154,100 @@ public class HistorialDAO {
 
         } catch (SQLException e) {
             System.out.println("Error historial admin: " + e.getMessage());
+        }
+
+        return lista;
+    }
+    
+    public List<Object[]> historialDevoluciones(String filtro) {
+        SimpleDateFormat sdfFecha = new SimpleDateFormat("dd/MM/yyyy");
+        SimpleDateFormat sdfFechaHora = new SimpleDateFormat("dd/MM/yyyy HH:mm");
+
+        List<Object[]> lista = new ArrayList<>();
+
+        String sql = """
+            SELECT
+                d.id_devolucion,
+
+                v.marca + ' ' + v.modelo AS vehiculo,
+                v.placa,
+
+                c.nombres + ' ' + c.apellidos AS conductor,
+
+                s.fecha_salida,
+                s.fecha_regreso,
+
+                d.kilometraje_salida,
+                d.kilometraje_regreso,
+
+                d.fecha_devolucion,
+
+                d.observaciones
+
+            FROM DevolucionVehiculo d
+
+            INNER JOIN Asignaciones a
+                ON d.id_asignacion = a.id_asignacion
+
+            INNER JOIN Vehiculos v
+                ON a.id_vehiculo = v.id_vehiculo
+
+            INNER JOIN Solicitudes s
+                ON a.id_solicitud = s.id_solicitud
+
+            INNER JOIN Empleados c
+                ON s.id_conductor = c.id_empleado
+
+            WHERE (
+                v.marca + ' ' + v.modelo LIKE ?
+                OR v.placa LIKE ?
+                OR c.nombres + ' ' + c.apellidos LIKE ?
+                OR ISNULL(d.observaciones, '') LIKE ?
+            )
+
+            ORDER BY d.fecha_devolucion DESC
+        """;
+
+        try (
+            Connection con = Conexion.getConexion();
+            PreparedStatement ps = con.prepareStatement(sql)
+        ) {
+
+            String busqueda = "%" + filtro + "%";
+
+            ps.setString(1, busqueda);
+            ps.setString(2, busqueda);
+            ps.setString(3, busqueda);
+            ps.setString(4, busqueda);
+
+            ResultSet rs = ps.executeQuery();
+
+            while (rs.next()) {
+                lista.add(new Object[]{
+                    rs.getInt("id_devolucion"),
+                    rs.getString("vehiculo"),
+                    rs.getString("placa"),
+                    rs.getString("conductor"),
+
+                    sdfFecha.format(rs.getDate("fecha_salida")),
+                    sdfFecha.format(rs.getDate("fecha_regreso")),
+
+                    rs.getDouble("kilometraje_salida"),
+                    rs.getDouble("kilometraje_regreso"),
+
+                    sdfFechaHora.format(
+                            rs.getTimestamp("fecha_devolucion")
+                    ),
+
+                    rs.getString("observaciones")
+                });
+            }
+        } catch (SQLException e) {
+
+            System.out.println(
+                "Error historial devoluciones: "
+                + e.getMessage()
+            );
         }
 
         return lista;
