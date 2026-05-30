@@ -323,6 +323,13 @@ public class FrmPrincipal extends javax.swing.JFrame {
        abrirFormulario(new FrmHistorialSolicitudes(userSesion));
     }//GEN-LAST:event_mItemHistorialSolicitudesActionPerformed
 
+    private void mItemHistorialAsignacionesActionPerformed(
+        java.awt.event.ActionEvent evt) {
+
+    abrirFormulario(new FrmHistorialAsignaciones());
+
+}
+    
     private void mItemReportesActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_mItemReportesActionPerformed
         String rol = userSesion.getRol().toUpperCase();
         switch (rol) {
@@ -334,6 +341,7 @@ public class FrmPrincipal extends javax.swing.JFrame {
             default:
                 JOptionPane.showMessageDialog(this, "Rol no autorizado");
         }
+        
     }//GEN-LAST:event_mItemReportesActionPerformed
 
 

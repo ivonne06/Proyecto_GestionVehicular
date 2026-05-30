@@ -157,4 +157,81 @@ public class HistorialDAO {
 
         return lista;
     }
+    
+    public List<Object[]> historialAsignaciones() {
+
+    List<Object[]> lista = new ArrayList<>();
+
+    String sql = """
+        SELECT
+
+            a.id_asignacion,
+
+            v.marca + ' ' +
+            v.modelo + ' (' +
+            v.placa + ')' AS vehiculo,
+
+            es.nombres + ' ' + es.apellidos AS solicitante,
+
+            ec.nombres + ' ' + ec.apellidos AS conductor,
+
+            u.username AS asignado_por,
+
+            s.fecha_salida,
+            s.fecha_regreso,
+
+            a.fecha_asignacion
+
+        FROM Asignaciones a
+
+        INNER JOIN Solicitudes s
+            ON a.id_solicitud = s.id_solicitud
+
+        INNER JOIN Vehiculos v
+            ON a.id_vehiculo = v.id_vehiculo
+
+        INNER JOIN Empleados es
+            ON s.id_empleado = es.id_empleado
+
+        INNER JOIN Empleados ec
+            ON s.id_conductor = ec.id_empleado
+
+        INNER JOIN Usuarios u
+            ON a.id_usuario_asigno = u.id_usuario
+
+        ORDER BY a.fecha_asignacion DESC
+    """;
+
+    try (Connection con = Conexion.getConexion();
+         PreparedStatement ps = con.prepareStatement(sql);
+         ResultSet rs = ps.executeQuery()) {
+
+        while (rs.next()) {
+
+            lista.add(new Object[]{
+
+                rs.getInt("id_asignacion"),
+                rs.getString("vehiculo"),
+                rs.getString("solicitante"),
+                rs.getString("conductor"),
+                rs.getString("asignado_por"),
+                rs.getDate("fecha_salida"),
+                rs.getDate("fecha_regreso"),
+                rs.getTimestamp("fecha_asignacion")
+
+            });
+
+        }
+
+    } catch (SQLException e) {
+
+        System.out.println(
+            "Error historial asignaciones: "
+            + e.getMessage()
+        );
+
+    }
+
+    return lista;
+}
 }
