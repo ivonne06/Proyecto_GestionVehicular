@@ -96,10 +96,15 @@ public class FrmSolicitudesAdmin extends javax.swing.JInternalFrame {
                 break;
 
             case "CANCELAR":
-                if (estado.equalsIgnoreCase("FINALIZADA") || estado.equalsIgnoreCase("CANCELADA")) {
-                    JOptionPane.showMessageDialog(this, "No se puede cancelar esta solicitud");
+                if (estado.equalsIgnoreCase("FINALIZADA")
+                        || estado.equalsIgnoreCase("CANCELADA")
+                        || estado.equalsIgnoreCase("ASIGNADA")) {
+
+                    JOptionPane.showMessageDialog(this,
+                            "Las solicitudes asignadas no pueden cancelarse");
                     return;
                 }
+
                 ok = dao.cancelarAdmin(id, motivo);
                 break;
         }
@@ -140,6 +145,12 @@ public class FrmSolicitudesAdmin extends javax.swing.JInternalFrame {
                 break;
 
             case "RECHAZADA":
+                btnAprovar.setEnabled(false);
+                btnRechazar.setEnabled(false);
+                btnCancelar.setEnabled(false);
+                break;
+                
+            case "ASIGNADA":
                 btnAprovar.setEnabled(false);
                 btnRechazar.setEnabled(false);
                 btnCancelar.setEnabled(false);
