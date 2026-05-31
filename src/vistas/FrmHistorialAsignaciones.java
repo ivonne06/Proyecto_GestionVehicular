@@ -6,6 +6,32 @@ package vistas;
 import dao.HistorialDAO;
 import java.util.List;
 import javax.swing.table.DefaultTableModel;
+import com.itextpdf.text.Document;
+import com.itextpdf.text.Paragraph;
+import com.itextpdf.text.Phrase;
+import com.itextpdf.text.pdf.PdfPCell;
+import com.itextpdf.text.pdf.PdfPTable;
+import com.itextpdf.text.pdf.PdfWriter;
+
+import java.io.FileOutputStream;
+import javax.swing.JFileChooser;
+import javax.swing.JOptionPane;
+import javax.swing.table.DefaultTableModel;
+
+import com.itextpdf.text.BaseColor;
+import com.itextpdf.text.Document;
+import com.itextpdf.text.Element;
+import com.itextpdf.text.Font;
+import com.itextpdf.text.PageSize;
+import com.itextpdf.text.Paragraph;
+import com.itextpdf.text.Phrase;
+import com.itextpdf.text.pdf.PdfPCell;
+import com.itextpdf.text.pdf.PdfPTable;
+import com.itextpdf.text.pdf.PdfWriter;
+
+import java.io.FileOutputStream;
+import javax.swing.JFileChooser;
+import javax.swing.JOptionPane;
 
 /**
  *
@@ -56,10 +82,10 @@ public class FrmHistorialAsignaciones extends javax.swing.JInternalFrame {
         lblTitulo = new javax.swing.JLabel();
         jScrollPane1 = new javax.swing.JScrollPane();
         tblHistorial = new javax.swing.JTable();
-        btnActualizar = new javax.swing.JButton();
         lblBuscar = new javax.swing.JLabel();
         txtBuscar = new javax.swing.JTextField();
         btnBuscar = new javax.swing.JButton();
+        btnPDF = new javax.swing.JButton();
 
         setClosable(true);
         setIconifiable(true);
@@ -81,13 +107,15 @@ public class FrmHistorialAsignaciones extends javax.swing.JInternalFrame {
         ));
         jScrollPane1.setViewportView(tblHistorial);
 
-        btnActualizar.setText("Actualizar");
-
         lblBuscar.setText("Buscar");
 
         txtBuscar.addActionListener(this::txtBuscarActionPerformed);
 
         btnBuscar.setText("Buscar");
+        btnBuscar.addActionListener(this::btnBuscarActionPerformed);
+
+        btnPDF.setText("Exportar PDF");
+        btnPDF.addActionListener(this::btnPDFActionPerformed);
 
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(getContentPane());
         getContentPane().setLayout(layout);
@@ -107,12 +135,9 @@ public class FrmHistorialAsignaciones extends javax.swing.JInternalFrame {
                                 .addGap(18, 18, 18)
                                 .addComponent(txtBuscar, javax.swing.GroupLayout.PREFERRED_SIZE, 537, javax.swing.GroupLayout.PREFERRED_SIZE)
                                 .addGap(27, 27, 27)
-                                .addComponent(btnBuscar)))))
+                                .addComponent(btnBuscar))
+                            .addComponent(btnPDF))))
                 .addContainerGap(15, Short.MAX_VALUE))
-            .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, layout.createSequentialGroup()
-                .addGap(0, 0, Short.MAX_VALUE)
-                .addComponent(btnActualizar)
-                .addGap(326, 326, 326))
         );
         layout.setVerticalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
@@ -126,8 +151,8 @@ public class FrmHistorialAsignaciones extends javax.swing.JInternalFrame {
                 .addGap(18, 18, 18)
                 .addComponent(jScrollPane1, javax.swing.GroupLayout.PREFERRED_SIZE, 285, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
-                .addComponent(btnActualizar, javax.swing.GroupLayout.PREFERRED_SIZE, 29, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addContainerGap(12, Short.MAX_VALUE))
+                .addComponent(btnPDF)
+                .addContainerGap(18, Short.MAX_VALUE))
         );
 
         pack();
@@ -137,10 +162,211 @@ public class FrmHistorialAsignaciones extends javax.swing.JInternalFrame {
         // TODO add your handling code here:
     }//GEN-LAST:event_txtBuscarActionPerformed
 
+    private void btnBuscarActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnBuscarActionPerformed
+        // TODO add your handling code here:
+        cargarHistorial(txtBuscar.getText().trim());
+    }//GEN-LAST:event_btnBuscarActionPerformed
+
+    private void btnPDFActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnPDFActionPerformed
+        // TODO add your handling code here:
+         
+
+    generarPDF();
+    }//GEN-LAST:event_btnPDFActionPerformed
+
+    
+    private void cargarHistorial(String filtro) {
+
+    DefaultTableModel modelo =
+            (DefaultTableModel) tblHistorial.getModel();
+
+    modelo.setRowCount(0);
+
+    HistorialDAO dao = new HistorialDAO();
+
+    List<Object[]> lista =
+            dao.historialAsignaciones(filtro);
+
+    for (Object[] fila : lista) {
+        modelo.addRow(fila);
+    }
+}
+    
+    
+    private void generarPDF() {
+
+    JFileChooser chooser = new JFileChooser();
+
+    chooser.setSelectedFile(
+            new java.io.File("HistorialAsignaciones.pdf")
+    );
+
+    int opcion = chooser.showSaveDialog(this);
+
+    if (opcion != JFileChooser.APPROVE_OPTION) {
+        return;
+    }
+
+    String ruta = chooser.getSelectedFile().getAbsolutePath();
+
+    if (!ruta.toLowerCase().endsWith(".pdf")) {
+        ruta += ".pdf";
+    }
+
+    try {
+
+        Document documento = new Document(
+                com.itextpdf.text.PageSize.A4.rotate(),
+                20,
+                20,
+                20,
+                20
+        );
+
+        PdfWriter.getInstance(
+                documento,
+                new FileOutputStream(ruta)
+        );
+
+        documento.open();
+
+        Font tituloFont = new Font(
+                Font.FontFamily.HELVETICA,
+                18,
+                Font.BOLD
+        );
+
+        Font subtituloFont = new Font(
+                Font.FontFamily.HELVETICA,
+                11,
+                Font.NORMAL
+        );
+
+        Font encabezadoFont = new Font(
+                Font.FontFamily.HELVETICA,
+                10,
+                Font.BOLD,
+                BaseColor.WHITE
+        );
+
+        Font contenidoFont = new Font(
+                Font.FontFamily.HELVETICA,
+                9,
+                Font.NORMAL
+        );
+
+        Paragraph titulo = new Paragraph(
+                "HISTORIAL DE ASIGNACIONES VEHICULARES",
+                tituloFont
+        );
+
+        titulo.setAlignment(Element.ALIGN_CENTER);
+
+        documento.add(titulo);
+
+        Paragraph sistema = new Paragraph(
+                "Sistema de Gestión Vehicular",
+                subtituloFont
+        );
+
+        sistema.setAlignment(Element.ALIGN_CENTER);
+
+        documento.add(sistema);
+
+        documento.add(new Paragraph(
+                "Fecha de generación: "
+                + new java.text.SimpleDateFormat(
+                        "dd/MM/yyyy HH:mm"
+                ).format(new java.util.Date())
+        ));
+
+        documento.add(new Paragraph(" "));
+
+        PdfPTable tabla = new PdfPTable(
+                tblHistorial.getColumnCount()
+        );
+
+        tabla.setWidthPercentage(100);
+
+        for (int i = 0;
+                i < tblHistorial.getColumnCount();
+                i++) {
+
+            PdfPCell celda = new PdfPCell(
+                    new Phrase(
+                            tblHistorial.getColumnName(i),
+                            encabezadoFont
+                    )
+            );
+
+            celda.setBackgroundColor(
+                    BaseColor.DARK_GRAY
+            );
+
+            celda.setHorizontalAlignment(
+                    Element.ALIGN_CENTER
+            );
+
+            celda.setPadding(8);
+
+            tabla.addCell(celda);
+        }
+
+        for (int fila = 0;
+                fila < tblHistorial.getRowCount();
+                fila++) {
+
+            for (int col = 0;
+                    col < tblHistorial.getColumnCount();
+                    col++) {
+
+                Object valor =
+                        tblHistorial.getValueAt(
+                                fila,
+                                col
+                        );
+
+                PdfPCell celda = new PdfPCell(
+                        new Phrase(
+                                valor == null
+                                ? ""
+                                : valor.toString(),
+                                contenidoFont
+                        )
+                );
+
+                celda.setHorizontalAlignment(
+                        Element.ALIGN_CENTER
+                );
+
+                celda.setPadding(5);
+
+                tabla.addCell(celda);
+            }
+        }
+
+        documento.add(tabla);
+
+        documento.close();
+
+        JOptionPane.showMessageDialog(
+                this,
+                "PDF generado correctamente."
+        );
+
+    } catch (Exception e) {
+
+        JOptionPane.showMessageDialog(
+                this,
+                "Error al generar PDF:\n"
+                + e.getMessage()
+        );
+    }
+}
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
-    private javax.swing.JButton btnActualizar;
     private javax.swing.JButton btnBuscar;
+    private javax.swing.JButton btnPDF;
     private javax.swing.JScrollPane jScrollPane1;
     private javax.swing.JLabel lblBuscar;
     private javax.swing.JLabel lblTitulo;
