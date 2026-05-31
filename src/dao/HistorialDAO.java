@@ -7,7 +7,9 @@ import java.util.List;
 import java.text.SimpleDateFormat;
 
 public class HistorialDAO {
-
+    SimpleDateFormat sdfFecha = new SimpleDateFormat("dd/MM/yyyy");
+    SimpleDateFormat sdfFechaHora = new SimpleDateFormat("dd/MM/yyyy HH:mm");
+    
     public List<Object[]> historialSolicitudesEmpleado(int idEmpleado, String filtro,String estado) {
 
         List<Object[]> lista = new ArrayList<>();
@@ -71,8 +73,8 @@ public class HistorialDAO {
                     rs.getString("conductor"),
                     rs.getString("destino"),
                     rs.getString("motivo_respuesta"),
-                    rs.getDate("fecha_salida"),
-                    rs.getDate("fecha_regreso"),
+                    sdfFecha.format(rs.getDate("fecha_salida")),
+                    sdfFecha.format(rs.getDate("fecha_regreso")),
                     rs.getString("estado")
                 });
             }
@@ -146,8 +148,8 @@ public class HistorialDAO {
                     rs.getString("conductor"),
                     rs.getString("destino"),
                     rs.getString("motivo_respuesta"),
-                    rs.getDate("fecha_salida"),
-                    rs.getDate("fecha_regreso"),
+                    sdfFecha.format(rs.getDate("fecha_salida")),
+                    sdfFecha.format(rs.getDate("fecha_regreso")),
                     rs.getString("estado")
                 });
             }
@@ -216,10 +218,11 @@ public class HistorialDAO {
                 rs.getString("solicitante"),
                 rs.getString("conductor"),
                 rs.getString("asignado_por"),
-                rs.getDate("fecha_salida"),
-                rs.getDate("fecha_regreso"),
-                rs.getTimestamp("fecha_asignacion")
-
+                sdfFecha.format(rs.getDate("fecha_salida")),
+                sdfFecha.format(rs.getDate("fecha_regreso")),
+                sdfFechaHora.format(
+                        rs.getTimestamp("fecha_asignacion")
+                )
             });
 
         }
@@ -236,8 +239,6 @@ public class HistorialDAO {
     return lista;
 }
     public List<Object[]> historialDevoluciones(String filtro) {
-        SimpleDateFormat sdfFecha = new SimpleDateFormat("dd/MM/yyyy");
-        SimpleDateFormat sdfFechaHora = new SimpleDateFormat("dd/MM/yyyy HH:mm");
 
         List<Object[]> lista = new ArrayList<>();
 

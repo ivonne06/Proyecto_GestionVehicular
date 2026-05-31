@@ -32,6 +32,14 @@ import com.itextpdf.text.pdf.PdfWriter;
 import java.io.FileOutputStream;
 import javax.swing.JFileChooser;
 import javax.swing.JOptionPane;
+import com.itextpdf.text.Image;
+
+import com.itextpdf.text.*;
+import com.itextpdf.text.pdf.*;
+
+import java.io.FileOutputStream;
+import javax.swing.JFileChooser;
+import javax.swing.JOptionPane;
 
 /**
  *
@@ -193,7 +201,8 @@ public class FrmHistorialAsignaciones extends javax.swing.JInternalFrame {
 }
     
     
-    private void generarPDF() {
+    
+private void generarPDF() {
 
     JFileChooser chooser = new JFileChooser();
 
@@ -216,7 +225,7 @@ public class FrmHistorialAsignaciones extends javax.swing.JInternalFrame {
     try {
 
         Document documento = new Document(
-                com.itextpdf.text.PageSize.A4.rotate(),
+                PageSize.A4.rotate(),
                 20,
                 20,
                 20,
@@ -230,16 +239,117 @@ public class FrmHistorialAsignaciones extends javax.swing.JInternalFrame {
 
         documento.open();
 
+        // ==========================
+        // LOGO
+        // ==========================
+
+        Image logo = Image.getInstance(
+                getClass().getResource("/img/logo.png")
+        );
+
+        logo.scaleToFit(100, 100);
+
+        // ==========================
+        // ENCABEZADO
+        // ==========================
+
+        PdfPTable encabezado = new PdfPTable(2);
+
+        encabezado.setWidthPercentage(100);
+
+        encabezado.setWidths(
+                new float[]{1f, 4f}
+        );
+
+        PdfPCell celdaLogo = new PdfPCell(logo);
+
+        celdaLogo.setBorder(Rectangle.NO_BORDER);
+
+        encabezado.addCell(celdaLogo);
+
         Font tituloFont = new Font(
                 Font.FontFamily.HELVETICA,
                 18,
                 Font.BOLD
         );
 
-        Font subtituloFont = new Font(
+        Font textoFont = new Font(
                 Font.FontFamily.HELVETICA,
-                11,
+                10,
                 Font.NORMAL
+        );
+
+        PdfPCell info = new PdfPCell();
+
+        info.setBorder(Rectangle.NO_BORDER);
+
+        info.addElement(new Paragraph(
+                "SISTEMA DE GESTIÓN VEHICULAR",
+                tituloFont
+        ));
+
+        info.addElement(new Paragraph(
+                "Historial de Asignaciones Vehiculares",
+                textoFont
+        ));
+
+        info.addElement(new Paragraph(
+                "Fecha de generación: "
+                + new java.text.SimpleDateFormat(
+                        "dd/MM/yyyy HH:mm"
+                ).format(new java.util.Date()),
+                textoFont
+        ));
+
+        encabezado.addCell(info);
+
+        documento.add(encabezado);
+
+        documento.add(new Paragraph(" "));
+        documento.add(new Paragraph(" "));
+
+        // ==========================
+        // TÍTULO
+        // ==========================
+
+        Font reporteFont = new Font(
+                Font.FontFamily.HELVETICA,
+                14,
+                Font.BOLD
+        );
+
+        Paragraph titulo = new Paragraph(
+                "REPORTE DE HISTORIAL DE ASIGNACIONES",
+                reporteFont
+        );
+
+        titulo.setAlignment(Element.ALIGN_CENTER);
+
+        documento.add(titulo);
+
+        documento.add(new Paragraph(" "));
+
+        // ==========================
+        // TABLA
+        // ==========================
+
+        PdfPTable tabla = new PdfPTable(
+                tblHistorial.getColumnCount()
+        );
+
+        tabla.setWidthPercentage(100);
+
+        tabla.setWidths(
+                new float[]{
+                    1f, // ID
+                    4f, // Vehiculo
+                    3f, // Solicitante
+                    3f, // Conductor
+                    2f, // Asignado Por
+                    2f, // Fecha Salida
+                    2f, // Fecha Regreso
+                    3f  // Fecha Asignacion
+                }
         );
 
         Font encabezadoFont = new Font(
@@ -255,42 +365,11 @@ public class FrmHistorialAsignaciones extends javax.swing.JInternalFrame {
                 Font.NORMAL
         );
 
-        Paragraph titulo = new Paragraph(
-                "HISTORIAL DE ASIGNACIONES VEHICULARES",
-                tituloFont
-        );
-
-        titulo.setAlignment(Element.ALIGN_CENTER);
-
-        documento.add(titulo);
-
-        Paragraph sistema = new Paragraph(
-                "Sistema de Gestión Vehicular",
-                subtituloFont
-        );
-
-        sistema.setAlignment(Element.ALIGN_CENTER);
-
-        documento.add(sistema);
-
-        documento.add(new Paragraph(
-                "Fecha de generación: "
-                + new java.text.SimpleDateFormat(
-                        "dd/MM/yyyy HH:mm"
-                ).format(new java.util.Date())
-        ));
-
-        documento.add(new Paragraph(" "));
-
-        PdfPTable tabla = new PdfPTable(
-                tblHistorial.getColumnCount()
-        );
-
-        tabla.setWidthPercentage(100);
+        // Encabezados
 
         for (int i = 0;
-                i < tblHistorial.getColumnCount();
-                i++) {
+             i < tblHistorial.getColumnCount();
+             i++) {
 
             PdfPCell celda = new PdfPCell(
                     new Phrase(
@@ -312,13 +391,15 @@ public class FrmHistorialAsignaciones extends javax.swing.JInternalFrame {
             tabla.addCell(celda);
         }
 
+        // Datos
+
         for (int fila = 0;
-                fila < tblHistorial.getRowCount();
-                fila++) {
+             fila < tblHistorial.getRowCount();
+             fila++) {
 
             for (int col = 0;
-                    col < tblHistorial.getColumnCount();
-                    col++) {
+                 col < tblHistorial.getColumnCount();
+                 col++) {
 
                 Object valor =
                         tblHistorial.getValueAt(
@@ -335,17 +416,40 @@ public class FrmHistorialAsignaciones extends javax.swing.JInternalFrame {
                         )
                 );
 
+                celda.setPadding(5);
+
                 celda.setHorizontalAlignment(
                         Element.ALIGN_CENTER
                 );
-
-                celda.setPadding(5);
 
                 tabla.addCell(celda);
             }
         }
 
         documento.add(tabla);
+
+        documento.add(new Paragraph(" "));
+        documento.add(new Paragraph(" "));
+
+        // ==========================
+        // PIE DEL REPORTE
+        // ==========================
+
+        Paragraph total = new Paragraph(
+                "Total de registros: "
+                + tblHistorial.getRowCount(),
+                textoFont
+        );
+
+        documento.add(total);
+
+        documento.add(new Paragraph(" "));
+        documento.add(new Paragraph(" "));
+        documento.add(new Paragraph(" "));
+        documento.add(new Paragraph(" "));
+
+        
+       
 
         documento.close();
 
@@ -358,9 +462,10 @@ public class FrmHistorialAsignaciones extends javax.swing.JInternalFrame {
 
         JOptionPane.showMessageDialog(
                 this,
-                "Error al generar PDF:\n"
-                + e.getMessage()
+                "Error al generar PDF:\n" + e.getMessage()
         );
+
+        e.printStackTrace();
     }
 }
 

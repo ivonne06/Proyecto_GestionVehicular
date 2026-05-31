@@ -8,6 +8,17 @@ import dao.HistorialDAO;
 import javax.swing.table.DefaultTableModel;
 import modelo.Usuario;
 
+
+import com.itextpdf.text.*;
+import com.itextpdf.text.pdf.*;
+
+import java.io.File;
+import java.io.FileOutputStream;
+import java.io.InputStream;
+
+import javax.swing.JFileChooser;
+import javax.swing.JOptionPane;
+
 /**
  *
  * @author ivone
@@ -22,6 +33,15 @@ public class FrmHistorialSolicitudes extends javax.swing.JInternalFrame {
         initComponents();
         this.usuario = usr;
         cargarTabla();
+        
+        btnPDF = new javax.swing.JButton();
+
+btnPDF.setText("Generar PDF");
+btnPDF.addActionListener(new java.awt.event.ActionListener() {
+    public void actionPerformed(java.awt.event.ActionEvent evt) {
+        btnPDFActionPerformed(evt);
+    }
+});
     }
     
     private void cargarTabla() {
@@ -65,6 +85,285 @@ public class FrmHistorialSolicitudes extends javax.swing.JInternalFrame {
         tblHistorial.getColumnModel().getColumn(6).setPreferredWidth(80);   // Regreso
         tblHistorial.getColumnModel().getColumn(7).setPreferredWidth(80);   // Estado
     }
+    
+    private void generarPDF() {
+
+    JFileChooser chooser = new JFileChooser();
+
+    chooser.setSelectedFile(
+            new File("Historial_Solicitudes.pdf"));
+
+    int opcion = chooser.showSaveDialog(this);
+
+    if (opcion != JFileChooser.APPROVE_OPTION) {
+        return;
+    }
+
+    String ruta = chooser.getSelectedFile().getAbsolutePath();
+
+    if (!ruta.toLowerCase().endsWith(".pdf")) {
+        ruta += ".pdf";
+    }
+
+    try {
+
+        Document documento =
+                new Document(PageSize.A4.rotate());
+
+        PdfWriter.getInstance(
+                documento,
+                new FileOutputStream(ruta));
+
+        documento.open();
+
+        // ==========================
+        // LOGO
+        // ==========================
+
+        try {
+
+            InputStream is =
+                    getClass().getResourceAsStream(
+                            "/img/logo.png");
+
+            if (is != null) {
+
+                byte[] bytes = is.readAllBytes();
+
+                Image logo =
+                        Image.getInstance(bytes);
+
+                logo.scaleToFit(90, 90);
+                logo.setAlignment(Image.ALIGN_CENTER);
+
+                documento.add(logo);
+            }
+
+        } catch (Exception e) {
+
+            System.out.println(
+                    "Logo no encontrado");
+        }
+
+        // ==========================
+        // TITULO
+        // ==========================
+
+        Font fuenteTitulo =
+                new Font(
+                        Font.FontFamily.HELVETICA,
+                        18,
+                        Font.BOLD,
+                        new BaseColor(41, 128, 185));
+
+        Paragraph titulo =
+                new Paragraph(
+                        "SISTEMA DE GESTIÓN VEHICULAR\n"
+                        + "HISTORIAL DE SOLICITUDES",
+                        fuenteTitulo);
+
+        titulo.setAlignment(
+                Element.ALIGN_CENTER);
+
+        documento.add(titulo);
+
+        documento.add(new Paragraph(" "));
+
+        Paragraph fecha =
+                new Paragraph(
+                        "Fecha de generación: "
+                        + new java.text.SimpleDateFormat(
+                                "dd/MM/yyyy HH:mm:ss")
+                                .format(
+                                        new java.util.Date()));
+
+        fecha.setAlignment(
+                Element.ALIGN_RIGHT);
+
+        documento.add(fecha);
+
+        documento.add(new Paragraph(" "));
+        documento.add(new Paragraph(" "));
+
+        // ==========================
+        // TABLA
+        // ==========================
+
+        PdfPTable tabla =
+        new PdfPTable(
+                tblHistorial.getColumnCount());
+
+        tabla.setWidthPercentage(100);
+
+        // Anchos corregidos
+        tabla.setWidths(new float[]{
+                35,   // ID
+                150,  // Empleado
+                150,  // Conductor
+                120,  // Destino
+                280,  // Motivo
+                130,  // Salida
+                130,  // Regreso
+                130   // Estado
+});
+
+        // ==========================
+        // ENCABEZADOS
+        // ==========================
+
+        Font fuenteEncabezado =
+                new Font(
+                        Font.FontFamily.HELVETICA,
+                        10,
+                        Font.BOLD,
+                        BaseColor.WHITE);
+
+        for (int i = 0;
+                i < tblHistorial.getColumnCount();
+                i++) {
+
+            PdfPCell celda =
+                    new PdfPCell(
+                            new Phrase(
+                                    tblHistorial.getColumnName(i),
+                                    fuenteEncabezado));
+
+            celda.setBackgroundColor(
+                    new BaseColor(52, 73, 94));
+
+            celda.setHorizontalAlignment(
+                    Element.ALIGN_CENTER);
+
+            celda.setVerticalAlignment(
+                    Element.ALIGN_MIDDLE);
+
+            celda.setPadding(8);
+
+            tabla.addCell(celda);
+        }
+
+        // ==========================
+        // DATOS
+        // ==========================
+
+        for (int fila = 0;
+                fila < tblHistorial.getRowCount();
+                fila++) {
+
+            for (int col = 0;
+                    col < tblHistorial.getColumnCount();
+                    col++) {
+
+                Object valor =
+                        tblHistorial.getValueAt(
+                                fila,
+                                col);
+
+                String texto = "";
+
+                if (valor != null) {
+
+                    if (valor instanceof java.util.Date) {
+
+                        texto =
+                                new java.text.SimpleDateFormat(
+                                        "dd/MM/yyyy")
+                                        .format(
+                                                (java.util.Date) valor);
+
+                    } else {
+
+                        texto = valor.toString();
+                    }
+                }
+
+                PdfPCell celda =
+                        new PdfPCell(
+                                new Phrase(texto));
+
+                celda.setPadding(5);
+
+                if (fila % 2 == 0) {
+
+                    celda.setBackgroundColor(
+                            new BaseColor(245, 245, 245));
+                }
+
+                // ID centrado
+                if (col == 0) {
+
+                    celda.setHorizontalAlignment(
+                            Element.ALIGN_CENTER);
+                }
+
+                // Salida y Regreso centradas
+                if (col == 5 || col == 6) {
+
+                    celda.setHorizontalAlignment(
+                            Element.ALIGN_CENTER);
+                }
+
+                // Estado centrado y coloreado
+                if (col == 7) {
+
+                    celda.setHorizontalAlignment(
+                            Element.ALIGN_CENTER);
+
+                    String estado =
+                            texto.toUpperCase();
+
+                    if (estado.equals("FINALIZADA")) {
+
+                        celda.setBackgroundColor(
+                                new BaseColor(
+                                        212, 237, 218));
+
+                    } else if (estado.equals("RECHAZADA")) {
+
+                        celda.setBackgroundColor(
+                                new BaseColor(
+                                        248, 215, 218));
+
+                    } else if (estado.equals("CANCELADA")) {
+
+                        celda.setBackgroundColor(
+                                new BaseColor(
+                                        255, 243, 205));
+                    }
+                }
+
+                tabla.addCell(celda);
+            }
+        }
+
+        documento.add(tabla);
+
+        documento.add(new Paragraph(" "));
+        documento.add(new Paragraph(" "));
+
+        Paragraph pie =
+                new Paragraph(
+                        "Reporte generado automáticamente por el Sistema de Gestión Vehicular.");
+
+        pie.setAlignment(
+                Element.ALIGN_CENTER);
+
+        documento.add(pie);
+
+        documento.close();
+
+        JOptionPane.showMessageDialog(
+                this,
+                "PDF generado correctamente.");
+
+    } catch (Exception e) {
+
+        JOptionPane.showMessageDialog(
+                this,
+                "Error al generar PDF:\n"
+                + e.getMessage());
+    }
+}
 
     /**
      * This method is called from within the constructor to initialize the form.
@@ -82,6 +381,7 @@ public class FrmHistorialSolicitudes extends javax.swing.JInternalFrame {
         jLabel1 = new javax.swing.JLabel();
         cmbEstado = new javax.swing.JComboBox<>();
         Tipo1 = new javax.swing.JLabel();
+        btnPDF = new javax.swing.JButton();
 
         setClosable(true);
         setIconifiable(true);
@@ -128,15 +428,19 @@ public class FrmHistorialSolicitudes extends javax.swing.JInternalFrame {
 
         Tipo1.setText("Estado: ");
 
+        btnPDF.setText("Generar PDF");
+        btnPDF.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                btnPDFActionPerformed(evt);
+            }
+        });
+
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(getContentPane());
         getContentPane().setLayout(layout);
         layout.setHorizontalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(layout.createSequentialGroup()
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                    .addGroup(layout.createSequentialGroup()
-                        .addContainerGap()
-                        .addComponent(jScrollPane1))
                     .addGroup(layout.createSequentialGroup()
                         .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                             .addGroup(layout.createSequentialGroup()
@@ -152,8 +456,15 @@ public class FrmHistorialSolicitudes extends javax.swing.JInternalFrame {
                             .addGroup(layout.createSequentialGroup()
                                 .addGap(192, 192, 192)
                                 .addComponent(jLabel1)))
-                        .addGap(37, 37, 37)))
+                        .addGap(37, 37, 37))
+                    .addGroup(layout.createSequentialGroup()
+                        .addContainerGap()
+                        .addComponent(jScrollPane1)))
                 .addContainerGap())
+            .addGroup(layout.createSequentialGroup()
+                .addContainerGap()
+                .addComponent(btnPDF)
+                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
         );
         layout.setVerticalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
@@ -169,7 +480,9 @@ public class FrmHistorialSolicitudes extends javax.swing.JInternalFrame {
                     .addComponent(cmbEstado, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
                 .addGap(49, 49, 49)
                 .addComponent(jScrollPane1, javax.swing.GroupLayout.PREFERRED_SIZE, 300, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addGap(36, 36, 36))
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addComponent(btnPDF)
+                .addGap(7, 7, 7))
         );
 
         pack();
@@ -183,9 +496,17 @@ public class FrmHistorialSolicitudes extends javax.swing.JInternalFrame {
         cargarTabla();
     }//GEN-LAST:event_cmbEstadoActionPerformed
 
+    private void btnPDFActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnPDFActionPerformed
+        // TODO add your handling code here:
+        
+            generarPDF();
+
+    }//GEN-LAST:event_btnPDFActionPerformed
+
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JLabel Tipo1;
+    private javax.swing.JButton btnPDF;
     private javax.swing.JComboBox<String> cmbEstado;
     private javax.swing.JLabel jLabel1;
     private javax.swing.JLabel jLabel7;

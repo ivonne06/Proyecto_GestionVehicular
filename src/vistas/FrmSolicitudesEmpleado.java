@@ -5,6 +5,9 @@ import modelo.Usuario;
 import dao.SolicitudDao;
 import javax.swing.JOptionPane;
 import modelo.Solicitud;
+import java.text.SimpleDateFormat;
+import java.util.Date;
+import javax.swing.table.DefaultTableCellRenderer;
 
 public class FrmSolicitudesEmpleado extends javax.swing.JInternalFrame {
 
@@ -26,8 +29,8 @@ public class FrmSolicitudesEmpleado extends javax.swing.JInternalFrame {
         lblIdConductor.setText("");
         validarRol();
 
-        dcSalida.setDateFormatString("yyyy-MM-dd");
-        dcRegreso.setDateFormatString("yyyy-MM-dd");
+        dcSalida.setDateFormatString("dd/MM/yyyy");
+        dcRegreso.setDateFormatString("dd/MM/yyyy");
         dcSalida.setMinSelectableDate(hoySinHora);
         dcRegreso.setMinSelectableDate(hoySinHora);
         
@@ -82,12 +85,12 @@ public class FrmSolicitudesEmpleado extends javax.swing.JInternalFrame {
         
         java.util.Date hoySinHora = quitarHora(new java.util.Date());
         
-        java.util.Date salida = quitarHora(dcSalida.getDate());
-        java.util.Date regreso = quitarHora(dcRegreso.getDate());
-
-        if (salida == null || regreso == null) {
+        if (dcSalida.getDate() == null || dcRegreso.getDate() == null) {
             throw new Exception("Debe seleccionar las fechas");
         }
+
+        java.util.Date salida = quitarHora(dcSalida.getDate());
+        java.util.Date regreso = quitarHora(dcRegreso.getDate());
         
         if (salida.before(hoySinHora)) {
             throw new Exception("La fecha de salida no puede ser anterior a hoy");
@@ -158,9 +161,7 @@ public class FrmSolicitudesEmpleado extends javax.swing.JInternalFrame {
         txtPasajeros = new javax.swing.JFormattedTextField();
         txtDestino = new javax.swing.JTextField();
         jLabel4 = new javax.swing.JLabel();
-        dcSalida = new com.toedter.calendar.JDateChooser();
         jLabel5 = new javax.swing.JLabel();
-        dcRegreso = new com.toedter.calendar.JDateChooser();
         btnGuardar = new javax.swing.JButton();
         btnCancelar = new javax.swing.JButton();
         jScrollPane1 = new javax.swing.JScrollPane();
@@ -171,6 +172,8 @@ public class FrmSolicitudesEmpleado extends javax.swing.JInternalFrame {
         txtConductor = new javax.swing.JTextField();
         lblIdConductor = new javax.swing.JLabel();
         btnLimpiar = new javax.swing.JButton();
+        dcSalida = new com.toedter.calendar.JDateChooser();
+        dcRegreso = new com.toedter.calendar.JDateChooser();
 
         setClosable(true);
         setIconifiable(true);
@@ -193,12 +196,6 @@ public class FrmSolicitudesEmpleado extends javax.swing.JInternalFrame {
         txtPasajeros.setFormatterFactory(new javax.swing.text.DefaultFormatterFactory(new javax.swing.text.NumberFormatter(new java.text.DecimalFormat("#0"))));
 
         jLabel4.setText("Fecha de salida:");
-
-        dcSalida.addPropertyChangeListener(new java.beans.PropertyChangeListener() {
-            public void propertyChange(java.beans.PropertyChangeEvent evt) {
-                dcSalidaPropertyChange(evt);
-            }
-        });
 
         jLabel5.setText("Fecha de Regreso:");
 
@@ -266,6 +263,12 @@ public class FrmSolicitudesEmpleado extends javax.swing.JInternalFrame {
             }
         });
 
+        dcSalida.addPropertyChangeListener(new java.beans.PropertyChangeListener() {
+            public void propertyChange(java.beans.PropertyChangeEvent evt) {
+                dcSalidaPropertyChange(evt);
+            }
+        });
+
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(getContentPane());
         getContentPane().setLayout(layout);
         layout.setHorizontalGroup(
@@ -291,13 +294,13 @@ public class FrmSolicitudesEmpleado extends javax.swing.JInternalFrame {
                         .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
                             .addGroup(layout.createSequentialGroup()
                                 .addComponent(jLabel4)
-                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
-                                .addComponent(dcSalida, javax.swing.GroupLayout.PREFERRED_SIZE, 136, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                                .addComponent(dcSalida, javax.swing.GroupLayout.PREFERRED_SIZE, 154, javax.swing.GroupLayout.PREFERRED_SIZE)
                                 .addGap(18, 18, 18)
                                 .addComponent(jLabel5)
-                                .addGap(14, 14, 14)
-                                .addComponent(dcRegreso, javax.swing.GroupLayout.PREFERRED_SIZE, 136, javax.swing.GroupLayout.PREFERRED_SIZE)
-                                .addGap(36, 36, 36)
+                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
+                                .addComponent(dcRegreso, javax.swing.GroupLayout.PREFERRED_SIZE, 156, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                                 .addComponent(jLabel3)
                                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                                 .addComponent(txtPasajeros, javax.swing.GroupLayout.PREFERRED_SIZE, 74, javax.swing.GroupLayout.PREFERRED_SIZE)
@@ -338,13 +341,12 @@ public class FrmSolicitudesEmpleado extends javax.swing.JInternalFrame {
                             .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, layout.createSequentialGroup()
                                 .addComponent(jLabel4)
                                 .addGap(37, 37, 37))
-                            .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                                .addComponent(jLabel5)
-                                .addComponent(dcRegreso, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                                .addComponent(dcSalida, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                                    .addComponent(txtPasajeros, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                                    .addComponent(jLabel3))))
+                            .addComponent(jLabel5)
+                            .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                                .addComponent(txtPasajeros, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                .addComponent(jLabel3))
+                            .addComponent(dcSalida, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                            .addComponent(dcRegreso, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
                         .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                             .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, layout.createSequentialGroup()
                                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
@@ -584,25 +586,39 @@ public class FrmSolicitudesEmpleado extends javax.swing.JInternalFrame {
     }//GEN-LAST:event_btnLimpiarActionPerformed
 
     private void dcSalidaPropertyChange(java.beans.PropertyChangeEvent evt) {//GEN-FIRST:event_dcSalidaPropertyChange
-        if ("date".equals(evt.getPropertyName())) {
+        if (!"date".equals(evt.getPropertyName())) {
+            return;
+        }
 
-            java.util.Date fechaSalida = dcSalida.getDate();
+        java.util.Date fechaSalida = dcSalida.getDate();
 
-            if (fechaSalida != null) {
+        if (fechaSalida == null) {
+            dcRegreso.setMinSelectableDate(hoySinHora);
+            return;
+        }
 
-                //no permitir fechas pasadas en regreso
-                dcRegreso.setMinSelectableDate(fechaSalida);
+        if (fechaSalida.before(hoySinHora)) {
 
-                if (fechaSalida.before(hoySinHora)) {
-                    JOptionPane.showMessageDialog(this, 
-                        "La fecha de salida no puede ser anterior a hoy");
+            JOptionPane.showMessageDialog(
+                this,
+                "La fecha de salida no puede ser anterior a hoy"
+            );
 
-                    dcSalida.setDate(null);
-                }
-            }
+            dcSalida.setDate(null);
+            dcRegreso.setMinSelectableDate(hoySinHora);
+            return;
+        }
+
+        // Bloquea todas las fechas anteriores a la salida
+        dcRegreso.setMinSelectableDate(fechaSalida);
+
+        // Si la fecha de regreso quedó antes de la salida, la limpia
+        if (dcRegreso.getDate() != null
+                && dcRegreso.getDate().before(fechaSalida)) {
+
+            dcRegreso.setDate(null);
         }
     }//GEN-LAST:event_dcSalidaPropertyChange
-
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JButton btnActualizar;
